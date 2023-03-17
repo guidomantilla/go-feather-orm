@@ -38,5 +38,6 @@ prepare:
 	go install -v github.com/incu6us/goimports-reviser/v3@latest
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 	go install github.com/golang/mock/mockgen@latest
+	go install github.com/cweill/gotests/gotests@latest
 	go mod download
 	go mod tidy
