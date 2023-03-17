@@ -5,15 +5,6 @@ import (
 )
 
 const (
-	UsernameKey = ":username"
-	PasswordKey = ":password"
-	ServerKey   = ":server"
-	ServiceKey  = ":service"
-)
-
-//
-
-const (
 	OracleDriverName DriverName = iota
 	MysqlDriverName
 	PostgresDriverName
