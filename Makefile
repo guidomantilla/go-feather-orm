@@ -4,7 +4,7 @@ phony-goal: ; @echo $@
 validate: generate sort-import format vet lint coverage
 
 generate:
-	go generate ./pkg/...
+	go generate ./pkg/... ./tools/...
 
 sort-import:
 	goimports-reviser -rm-unused -set-alias -format -recursive pkg
