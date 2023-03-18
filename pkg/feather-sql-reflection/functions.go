@@ -1,7 +1,6 @@
 package feather_sql_reflection
 
 import (
-	"errors"
 	"reflect"
 	"strings"
 )
@@ -26,15 +25,16 @@ func RetrieveColumnNames(value any, columnFilterFunc ColumnFilterFunc) ([]string
 	columnNames := make([]string, 0)
 	for _, field := range fields {
 		reflectedTagKey := field.Tag.Get(TagKey)
-		if reflectedTagKey == "-" {
+		if reflectedTagKey == "-" || reflectedTagKey == "" {
 			continue
 		}
 
 		values := strings.Split(reflectedTagKey, ",")
-		if len(values) == 0 || (len(values) == 1 && values[0] == "") {
-			continue
-		}
-
+		/*
+			if values == nil || len(values) == 0 || (len(values) == 1 && values[0] == "") {
+				continue
+			}
+		*/
 		if columnFilterFunc(values) {
 			columnNames = append(columnNames, values[0])
 		}
@@ -107,6 +107,10 @@ func retrieveFields(reflectedValue reflect.Value) []reflect.StructField {
 
 func retrieveReflectedStruct(value any) (*reflect.Value, error) {
 
+	if value == nil {
+		return nil, ErrAnyIsNil
+	}
+
 	reflectedValue := reflect.ValueOf(value)
 	if reflectedValue.Kind() == reflect.Ptr {
 		reflectedValue = reflectedValue.Elem()
@@ -117,5 +121,5 @@ func retrieveReflectedStruct(value any) (*reflect.Value, error) {
 		return &reflectedValue, nil
 	}
 
-	return nil, errors.New("value (any - interface{}) not a pointer, not a struct")
+	return nil, ErrAnyNotPointerOrStruct
 }
