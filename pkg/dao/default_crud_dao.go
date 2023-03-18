@@ -64,7 +64,7 @@ func (dao *DefaultCrudDao) Save(ctx context.Context, args ...any) (*int64, error
 	var err error
 	var serial *int64
 	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if serial, err = WriteContext(ctx, dao.statementCreate, args); err != nil {
+	if serial, err = WriteContext(ctx, dao.statementCreate, args...); err != nil {
 		return nil, err
 	}
 
@@ -75,7 +75,7 @@ func (dao *DefaultCrudDao) Update(ctx context.Context, args ...any) error {
 
 	var err error
 	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if _, err = WriteContext(ctx, dao.statementUpdate, args); err != nil {
+	if _, err = WriteContext(ctx, dao.statementUpdate, args...); err != nil {
 		return err
 	}
 
@@ -97,7 +97,7 @@ func (dao *DefaultCrudDao) FindById(ctx context.Context, id any, args ...any) er
 
 	var err error
 	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if err = ReadRowContext(ctx, dao.statementFindById, id, args); err != nil {
+	if err = ReadRowContext(ctx, dao.statementFindById, id, args...); err != nil {
 		return err
 	}
 
@@ -108,7 +108,7 @@ func (dao *DefaultCrudDao) ExistsById(ctx context.Context, id any, args ...any) 
 
 	var err error
 	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if err = dao.FindById(ctx, id, args); err != nil {
+	if err = dao.FindById(ctx, id, args...); err != nil {
 		return false
 	}
 
