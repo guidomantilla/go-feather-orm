@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/golang/mock v1.6.0
-	github.com/guidomantilla/go-feather-commons v0.1.0
+	github.com/guidomantilla/go-feather-commons v0.1.2
 	github.com/sijms/go-ora/v2 v2.6.3
 	go.uber.org/zap v1.24.0
 )
