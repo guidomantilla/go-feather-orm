@@ -5,7 +5,8 @@ import (
 )
 
 const (
-	OracleDriverName DriverName = iota
+	UnknownDriverName DriverName = iota - 1
+	OracleDriverName
 	MysqlDriverName
 	PostgresDriverName
 )
@@ -17,6 +18,8 @@ type DriverName int
 func (enum DriverName) String() string {
 
 	switch enum {
+	case UnknownDriverName:
+		return "unknown"
 	case OracleDriverName:
 		return "oracle"
 	case MysqlDriverName:
@@ -25,6 +28,21 @@ func (enum DriverName) String() string {
 		return "pgx"
 	}
 	return "unknown"
+}
+
+func (enum DriverName) ValueOf(driverName string) DriverName {
+
+	switch driverName {
+	case UnknownDriverName.String():
+		return UnknownDriverName
+	case OracleDriverName.String():
+		return OracleDriverName
+	case MysqlDriverName.String():
+		return MysqlDriverName
+	case PostgresDriverName.String():
+		return PostgresDriverName
+	}
+	return UnknownDriverName
 }
 
 //
