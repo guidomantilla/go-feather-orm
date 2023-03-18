@@ -31,7 +31,7 @@ func Init(targetPrefix string, environment environment.Environment, paramHolder 
 
 	driverName := environment.GetValue(targetPrefix + DatasourceDriver).AsString()
 	driver := feather_sql.UnknownDriverName.ValueOf(driverName)
-	if driver != feather_sql.UnknownDriverName {
+	if driver == feather_sql.UnknownDriverName {
 		zap.L().Fatal("server starting up - error setting up DB connection: invalid driver name")
 	}
 
