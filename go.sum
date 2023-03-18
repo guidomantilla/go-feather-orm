@@ -2,8 +2,8 @@ github.com/benbjohnson/clock v1.1.0 h1:Q92kusRqC1XV2MjkWETPvjJVqKetz1OzxZB7mHJLj
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/golang/mock v1.6.0 h1:ErTB+efbowRARo13NNdxyJji2egdxLGQhRaY+DUumQc=
 github.com/golang/mock v1.6.0/go.mod h1:p6yTPP+5HYm5mzsMV8JkE6ZKdX+/wYM6Hr+LicevLPs=
-github.com/guidomantilla/go-feather-commons v0.1.2 h1:K7bRrlsSmjCeIXmIM3f1wrELPcw7V+V+NYjO6rGQVaI=
-github.com/guidomantilla/go-feather-commons v0.1.2/go.mod h1:P2PCrgZyzzT54b5C+64MG+VoUiujdt/ztYmOq+jFgok=
+github.com/guidomantilla/go-feather-commons v0.2.2 h1:2gI0EO5TEeNh15htlheSIl93kx5KTqzes+zr+7fm954=
+github.com/guidomantilla/go-feather-commons v0.2.2/go.mod h1:urXaldhGquzj2knasUqgEOYcI4u+dF1dmtnAVvXkPUE=
 github.com/pkg/errors v0.8.1 h1:iURUrRGxPUNPdy5/HRSm+Yj6okJ6UtLINN0Q9M4+h3I=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/sijms/go-ora/v2 v2.6.3 h1:Ahvr10fjWWFgKRlGqwIrXz3ptZFEHd5EtLp6Wcg4I/Q=
