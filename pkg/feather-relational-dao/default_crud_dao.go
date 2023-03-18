@@ -13,7 +13,7 @@ import (
 )
 
 type DefaultCrudDao struct {
-	datasourceContext feather_relational_datasource.RelationalDatasourceContext
+	//datasourceContext feather_relational_datasource.RelationalDatasourceContext
 	driverName        feather_sql.DriverName
 	paramHolder       feather_sql.ParamHolder
 	statementCreate   string
