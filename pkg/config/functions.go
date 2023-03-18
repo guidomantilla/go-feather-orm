@@ -21,16 +21,17 @@ const (
 )
 
 var (
-	_singletonDatasource        datasource.RelationalDatasource
-	_singletonDatasourceContext datasource.RelationalDatasourceContext
+	_datasource        datasource.RelationalDatasource
+	_datasourceContext datasource.RelationalDatasourceContext
 )
 
-func Init(targetPrefix string, environment environment.Environment) (datasource.RelationalDatasource, datasource.RelationalDatasourceContext) {
+func Init(targetPrefix string, environment environment.Environment, paramHolder feather_sql.ParamHolder) (datasource.RelationalDatasource, datasource.RelationalDatasourceContext) {
 
 	zap.L().Info("server starting up - setting up DB connection")
 
-	driver := environment.GetValue(targetPrefix + DatasourceDriver).AsString()
-	if driver != feather_sql.OracleDriverName.String() {
+	driverName := environment.GetValue(targetPrefix + DatasourceDriver).AsString()
+	driver := feather_sql.UnknownDriverName.ValueOf(driverName)
+	if driver != feather_sql.UnknownDriverName {
 		zap.L().Fatal("server starting up - error setting up DB connection: invalid driver name")
 	}
 
@@ -40,11 +41,10 @@ func Init(targetPrefix string, environment environment.Environment) (datasource.
 	service := environment.GetValue(targetPrefix + DatasourceService).AsString()
 	url := environment.GetValue(targetPrefix + DatasourceUrl).AsString()
 
-	_singletonDatasourceContext = datasource.BuildRelationalDatasourceContext(feather_sql.OracleDriverName, feather_sql.NumberedParamHolder,
-		url, username, password, server, service)
+	_datasourceContext = datasource.BuildRelationalDatasourceContext(driver, paramHolder, url, username, password, server, service)
 
-	_singletonDatasource = datasource.BuildRelationalDatasource(_singletonDatasourceContext, sql.Open)
-	return _singletonDatasource, _singletonDatasourceContext
+	_datasource = datasource.BuildRelationalDatasource(_datasourceContext, sql.Open)
+	return _datasource, _datasourceContext
 }
 
 func Stop() error {
@@ -54,7 +54,7 @@ func Stop() error {
 
 	zap.L().Info("server shutting down - closing DB")
 
-	if database, err = _singletonDatasource.GetDatabase(); err != nil {
+	if database, err = _datasource.GetDatabase(); err != nil {
 		zap.L().Error(fmt.Sprintf("server shutting down - error closing DB: %s", err.Error()))
 		return err
 	}
