@@ -3,6 +3,7 @@ module github.com/guidomantilla/go-feather-sql
 go 1.18
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/golang/mock v1.6.0
 	github.com/guidomantilla/go-feather-commons v0.2.2
 	github.com/sijms/go-ora/v2 v2.6.3

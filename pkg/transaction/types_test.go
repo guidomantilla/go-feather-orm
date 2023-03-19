@@ -2,6 +2,10 @@ package transaction
 
 import (
 	"context"
+	"database/sql"
+	"errors"
+	"github.com/DATA-DOG/go-sqlmock"
+	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
 
@@ -9,6 +13,10 @@ import (
 )
 
 func TestBuildRelationalTransactionHandler(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	datasource2 := datasource.NewMockRelationalDatasource(ctrl)
+
 	type args struct {
 		relationalDatasource datasource.RelationalDatasource
 	}
@@ -17,7 +25,11 @@ func TestBuildRelationalTransactionHandler(t *testing.T) {
 		args args
 		want RelationalTransactionHandler
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Only Path",
+			args: args{relationalDatasource: datasource2},
+			want: NewRelationalTransactionHandler(datasource2),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -28,27 +40,50 @@ func TestBuildRelationalTransactionHandler(t *testing.T) {
 	}
 }
 
-func TestNewRelationalTransactionHandler(t *testing.T) {
-	type args struct {
-		relationalDatasource datasource.RelationalDatasource
-	}
-	tests := []struct {
-		name string
-		args args
-		want *DefaultDBTransactionHandler
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := NewRelationalTransactionHandler(tt.args.relationalDatasource); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewRelationalTransactionHandler() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
+
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	errGetDatabasePath := func() *DefaultDBTransactionHandler {
+		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource.EXPECT().GetDatabase().Return(nil, errors.New("some_error"))
+		return NewRelationalTransactionHandler(datasource)
+	}
+
+	errBeginPath := func() *DefaultDBTransactionHandler {
+		db, sqlMock, _ := sqlmock.New()
+		sqlMock.ExpectBegin().WillReturnError(errors.New("some_error"))
+		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource.EXPECT().GetDatabase().Return(db, nil)
+		return NewRelationalTransactionHandler(datasource)
+	}
+
+	errDeferPath := func() *DefaultDBTransactionHandler {
+		db, sqlMock, _ := sqlmock.New()
+		sqlMock.ExpectBegin()
+		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource.EXPECT().GetDatabase().Return(db, nil)
+		return NewRelationalTransactionHandler(datasource)
+	}
+
+	panicDeferPath := func() *DefaultDBTransactionHandler {
+		db, sqlMock, _ := sqlmock.New()
+		sqlMock.ExpectBegin()
+		sqlMock.ExpectRollback()
+		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource.EXPECT().GetDatabase().Return(db, nil)
+		return NewRelationalTransactionHandler(datasource)
+	}
+
+	happyPath := func() *DefaultDBTransactionHandler {
+		db, sqlMock, _ := sqlmock.New()
+		sqlMock.ExpectBegin()
+		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource.EXPECT().GetDatabase().Return(db, nil)
+		return NewRelationalTransactionHandler(datasource)
+	}
+
 	type args struct {
 		ctx context.Context
 		fn  RelationalTransactionHandlerFunction
@@ -59,7 +94,62 @@ func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "Err GetDatabase() Path",
+			handler: errGetDatabasePath(),
+			args: args{
+				ctx: context.TODO(),
+				fn: func(ctx context.Context, tx *sql.Tx) error {
+					return errors.New("some_error")
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name:    "Err Begin() Path",
+			handler: errBeginPath(),
+			args: args{
+				ctx: context.TODO(),
+				fn: func(ctx context.Context, tx *sql.Tx) error {
+					return nil
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name:    "Err Defer Path",
+			handler: errDeferPath(),
+			args: args{
+				ctx: context.TODO(),
+				fn: func(ctx context.Context, tx *sql.Tx) error {
+					return errors.New("some_error")
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name:    "Panic Defer Path",
+			handler: panicDeferPath(),
+			args: args{
+				ctx: context.TODO(),
+				fn: func(ctx context.Context, tx *sql.Tx) error {
+					panic("some_panic")
+				},
+			},
+			wantErr: false,
+		},
+
+		{
+			name:    "Happy ath",
+			handler: happyPath(),
+			args: args{
+				ctx: context.TODO(),
+				fn: func(ctx context.Context, tx *sql.Tx) error {
+					return nil
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -78,7 +168,14 @@ func Test_handleError(t *testing.T) {
 		name string
 		args args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "HappyPath",
+			args: args{err: nil},
+		},
+		{
+			name: "UnhappyPath",
+			args: args{err: errors.New("some error")},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

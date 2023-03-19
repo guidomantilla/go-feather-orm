@@ -48,10 +48,21 @@ func TestRetrieveColumnNames(t *testing.T) {
 			wantErr:   true,
 			errWanted: ErrAnyIsNil,
 		},
+
+		{
+			name: "Err columnFilterFunc Path",
+			args: args{
+				value:            modelOK01{},
+				columnFilterFunc: nil,
+			},
+			wantErr:   true,
+			errWanted: ErrColumnFilterFuncIsNil,
+		},
 		{
 			name: "Ignore No Tag reflectedTagKey Path",
 			args: args{
-				value: modelOK01{},
+				value:            modelOK01{},
+				columnFilterFunc: ColumnFilter,
 			},
 			want:    []string{},
 			wantErr: false,
@@ -59,7 +70,8 @@ func TestRetrieveColumnNames(t *testing.T) {
 		{
 			name: "Ignore Dash reflectedTagKey Path",
 			args: args{
-				value: modelOK02{},
+				value:            modelOK02{},
+				columnFilterFunc: ColumnFilter,
 			},
 			want:    []string{},
 			wantErr: false,
@@ -67,7 +79,8 @@ func TestRetrieveColumnNames(t *testing.T) {
 		{
 			name: "Ignore Empty reflectedTagKey Path",
 			args: args{
-				value: modelOK03{},
+				value:            modelOK03{},
+				columnFilterFunc: ColumnFilter,
 			},
 			want:    []string{},
 			wantErr: false,
@@ -418,6 +431,7 @@ func Test_retrieveFields(t *testing.T) {
 	valuesOK := []reflect.StructField{idField, nameField}
 
 	type modelNoOk struct {
+		id string
 	}
 	reflectedValueNoOk := reflect.ValueOf(modelNoOk{})
 	valuesNoOK := make([]reflect.StructField, 0)

@@ -20,6 +20,10 @@ func RetrieveColumnNames(value any, columnFilterFunc ColumnFilterFunc) ([]string
 		return nil, err
 	}
 
+	if columnFilterFunc == nil {
+		return nil, ErrColumnFilterFuncIsNil
+	}
+
 	fields := retrieveFields(*reflectedValue)
 
 	columnNames := make([]string, 0)

@@ -5,6 +5,7 @@ import (
 )
 
 func TestParseColumnAsNameValueSequence(t *testing.T) {
+
 	type args struct {
 		value     any
 		initChar  string
@@ -14,6 +15,47 @@ func TestParseColumnAsNameValueSequence(t *testing.T) {
 		fn01      ColumnFilterFunc
 		fn02      EvalColumnFunc
 	}
+
+	errRetrieveColumnNamesPath := func() args {
+		return args{
+			value: nil,
+		}
+	}
+
+	errColumnNames0Path := func() args {
+		type model struct {
+		}
+		return args{
+			value: model{},
+			fn01:  NoneColumnFilter,
+		}
+	}
+
+	errEvalColumnFuncIsNilPath := func() args {
+		type model struct {
+			Id string `sql:"id"`
+		}
+		return args{
+			value: model{},
+			fn01:  ColumnFilter,
+		}
+	}
+
+	happyPath := func() args {
+		type model struct {
+			Id string `sql:"id"`
+		}
+		return args{
+			value:     model{},
+			initChar:  "",
+			endChar:   "",
+			separator: "",
+			cont:      0,
+			fn01:      ColumnFilter,
+			fn02:      EvalNameValueNumbered,
+		}
+	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -21,7 +63,34 @@ func TestParseColumnAsNameValueSequence(t *testing.T) {
 		want1   int
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name:    "Err RetrieveColumnNames Path",
+			args:    errRetrieveColumnNamesPath(),
+			want:    "",
+			want1:   0,
+			wantErr: true,
+		},
+		{
+			name:    "Err columnNames 0 Path",
+			args:    errColumnNames0Path(),
+			want:    "",
+			want1:   0,
+			wantErr: true,
+		},
+		{
+			name:    "Err EvalColumnFunc Is Nil Path",
+			args:    errEvalColumnFuncIsNilPath(),
+			want:    "",
+			want1:   0,
+			wantErr: true,
+		},
+		{
+			name:    "Happy Path",
+			args:    happyPath(),
+			want:    "id = :1",
+			want1:   1,
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -51,7 +120,15 @@ func TestEvalNameOnly(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			args: args{
+				name:      "name",
+				in1:       0,
+				separator: "separator",
+			},
+			want: "nameseparator",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -73,7 +150,15 @@ func TestEvalNameValueNamed(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			args: args{
+				name:      "name",
+				in1:       0,
+				separator: "separator",
+			},
+			want: "name = :nameseparator",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -95,7 +180,15 @@ func TestEvalValueOnlyNamed(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			args: args{
+				name:      "name",
+				in1:       0,
+				separator: "separator",
+			},
+			want: ":nameseparator",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -117,7 +210,15 @@ func TestEvalNameValueNumbered(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			args: args{
+				name:      "name",
+				cont:      1,
+				separator: "separator",
+			},
+			want: "name = :1separator",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -139,7 +240,15 @@ func TestEvalValueOnlyNumbered(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			args: args{
+				in0:       "",
+				cont:      1,
+				separator: "separator",
+			},
+			want: ":1separator",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -161,7 +270,15 @@ func TestEvalNameValueQuestioned(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			args: args{
+				name:      "name",
+				in1:       0,
+				separator: "separator",
+			},
+			want: "name = :?separator",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -183,7 +300,15 @@ func TestEvalValueOnlyQuestioned(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			args: args{
+				in0:       "",
+				in1:       0,
+				separator: "separator",
+			},
+			want: ":?separator",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

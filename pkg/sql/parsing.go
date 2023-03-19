@@ -18,15 +18,17 @@ func ParseColumnAsNameValueSequence(value any, initChar string, endChar string, 
 		return "", 0, errors.New("value (any - interface{}) not tagged")
 	}
 
+	if fn02 == nil {
+		return "", 0, ErrEvalColumnFuncIsNil
+	}
+
 	sequence := initChar
 	for i, columnName := range columnNames {
 		sequence += fn02(columnName, cont+i+1, separator)
 	}
 
-	if sequence != "" {
-		last := strings.LastIndex(sequence, separator)
-		sequence = sequence[0:last] + endChar
-	}
+	last := strings.LastIndex(sequence, separator)
+	sequence = sequence[0:last] + endChar
 
 	return sequence, len(columnNames), nil
 }

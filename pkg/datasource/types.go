@@ -14,7 +14,6 @@ type RelationalDatasourceContext interface {
 
 func BuildRelationalDatasourceContext(driverName feather_sql.DriverName, paramHolder feather_sql.ParamHolder,
 	url string, username string, password string, server string, service string) RelationalDatasourceContext {
-
 	return NewRelationalDatasourceContext(driverName, paramHolder, url, username, password, server, service)
 }
 
