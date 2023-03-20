@@ -4,10 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/golang/mock/gomock"
 	"reflect"
 	"testing"
+
+	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/golang/mock/gomock"
 
 	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
 )

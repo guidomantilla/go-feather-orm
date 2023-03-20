@@ -10,11 +10,11 @@ func TestCreateSelectSQL(t *testing.T) {
 		Name string `sql:"name"`
 	}
 	type args struct {
-		in0   DriverName
-		table string
-		value any
-		fn01  ColumnFilterFunc
-		fn02  EvalColumnFunc
+		table       string
+		value       any
+		in0         DriverName
+		paramHolder ParamHolder
+		fn01        ColumnFilterFunc
 	}
 	tests := []struct {
 		name    string
@@ -47,8 +47,7 @@ func TestCreateSelectSQL(t *testing.T) {
 				in0:   0,
 				table: "some",
 				value: model{},
-				fn01:  ColumnFilter,
-				fn02:  nil,
+				fn01:  NoneColumnFilter,
 			},
 			want:    "",
 			wantErr: true,
@@ -60,15 +59,14 @@ func TestCreateSelectSQL(t *testing.T) {
 				table: "some",
 				value: model{},
 				fn01:  ColumnFilter,
-				fn02:  EvalValueOnlyNamed,
 			},
-			want:    "SELECT id, name FROM some WHERE :id AND :name",
+			want:    "SELECT id, name FROM some WHERE id = :id AND name = :name",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CreateSelectSQL(tt.args.in0, tt.args.table, tt.args.value, tt.args.fn01, tt.args.fn02)
+			got, err := CreateSelectSQL(tt.args.table, tt.args.value, tt.args.in0, tt.args.paramHolder, tt.args.fn01)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateSelectSQL() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -89,10 +87,10 @@ func TestCreateInsertSQL(t *testing.T) {
 		Name string `sql:"name"`
 	}
 	type args struct {
-		driverName DriverName
-		table      string
-		value      any
-		fn02       EvalColumnFunc
+		table       string
+		value       any
+		driverName  DriverName
+		paramHolder ParamHolder
 	}
 	tests := []struct {
 		name    string
@@ -114,7 +112,6 @@ func TestCreateInsertSQL(t *testing.T) {
 				driverName: 0,
 				table:      "some",
 				value:      model{},
-				fn02:       nil,
 			},
 			want:    "",
 			wantErr: true,
@@ -125,9 +122,8 @@ func TestCreateInsertSQL(t *testing.T) {
 				driverName: MysqlDriverName,
 				table:      "some",
 				value:      model{},
-				fn02:       EvalNameValueNumbered,
 			},
-			want:    "INSERT INTO some (id) VALUES (id = :1)",
+			want:    "INSERT INTO some (id) VALUES (:id)",
 			wantErr: false,
 		},
 		{
@@ -136,7 +132,6 @@ func TestCreateInsertSQL(t *testing.T) {
 				driverName: OracleDriverName,
 				table:      "some",
 				value:      model{},
-				fn02:       EvalNameValueNumbered,
 			},
 			want:    "",
 			wantErr: true,
@@ -147,15 +142,14 @@ func TestCreateInsertSQL(t *testing.T) {
 				driverName: OracleDriverName,
 				table:      "some",
 				value:      model2{},
-				fn02:       EvalValueOnlyNumbered,
 			},
-			want:    "INSERT INTO some (name) VALUES (:1) RETURNING id INTO :2",
+			want:    "INSERT INTO some (name) VALUES (:name) RETURNING id INTO :id",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CreateInsertSQL(tt.args.driverName, tt.args.table, tt.args.value, tt.args.fn02)
+			got, err := CreateInsertSQL(tt.args.table, tt.args.value, tt.args.driverName, tt.args.paramHolder)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateInsertSQL() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -172,11 +166,11 @@ func TestCreateUpdateSQL(t *testing.T) {
 		Id string `sql:"id"`
 	}
 	type args struct {
-		in0   DriverName
-		table string
-		value any
-		fn01  ColumnFilterFunc
-		fn02  EvalColumnFunc
+		table       string
+		value       any
+		in0         DriverName
+		paramHolder ParamHolder
+		fn01        ColumnFilterFunc
 	}
 	tests := []struct {
 		name    string
@@ -200,7 +194,6 @@ func TestCreateUpdateSQL(t *testing.T) {
 				table: "some",
 				value: model{},
 				fn01:  nil,
-				fn02:  EvalNameValueNumbered,
 			},
 			want:    "",
 			wantErr: true,
@@ -212,15 +205,14 @@ func TestCreateUpdateSQL(t *testing.T) {
 				table: "some",
 				value: model{},
 				fn01:  ColumnFilter,
-				fn02:  EvalNameValueNumbered,
 			},
-			want:    "UPDATE some SET id = :1 WHERE id = :2",
+			want:    "UPDATE some SET id = :id WHERE id = :id",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CreateUpdateSQL(tt.args.in0, tt.args.table, tt.args.value, tt.args.fn01, tt.args.fn02)
+			got, err := CreateUpdateSQL(tt.args.table, tt.args.value, tt.args.in0, tt.args.paramHolder, tt.args.fn01)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateUpdateSQL() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -237,11 +229,11 @@ func TestCreateDeleteSQL(t *testing.T) {
 		Id string `sql:"id"`
 	}
 	type args struct {
-		in0   DriverName
-		table string
-		value any
-		fn01  ColumnFilterFunc
-		fn02  EvalColumnFunc
+		table       string
+		value       any
+		in0         DriverName
+		paramHolder ParamHolder
+		fn01        ColumnFilterFunc
 	}
 	tests := []struct {
 		name    string
@@ -265,15 +257,14 @@ func TestCreateDeleteSQL(t *testing.T) {
 				table: "some",
 				value: model{},
 				fn01:  ColumnFilter,
-				fn02:  EvalNameValueNumbered,
 			},
-			want:    "DELETE FROM some WHERE id = :1",
+			want:    "DELETE FROM some WHERE id = :id",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := CreateDeleteSQL(tt.args.in0, tt.args.table, tt.args.value, tt.args.fn01, tt.args.fn02)
+			got, err := CreateDeleteSQL(tt.args.table, tt.args.value, tt.args.in0, tt.args.paramHolder, tt.args.fn01)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CreateDeleteSQL() error = %v, wantErr %v", err, tt.wantErr)
 				return

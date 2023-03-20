@@ -1,6 +1,6 @@
 package sql
 
-func CreateSelectSQL(_ DriverName, table string, value any, fn01 ColumnFilterFunc, fn02 EvalColumnFunc) (string, error) {
+func CreateSelectSQL(table string, value any, _ DriverName, paramHolder ParamHolder, fn01 ColumnFilterFunc) (string, error) {
 
 	empty := ""
 	separator := ", "
@@ -17,14 +17,14 @@ func CreateSelectSQL(_ DriverName, table string, value any, fn01 ColumnFilterFun
 
 	separator = " AND "
 	var whereSequence string
-	if whereSequence, _, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, 0, fn01, fn02); err != nil {
+	if whereSequence, _, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, 0, fn01, paramHolder.EvalNameValue()); err != nil {
 		return "", err
 	}
 
 	return "SELECT " + sequence + " FROM " + table + " WHERE " + whereSequence, nil
 }
 
-func CreateInsertSQL(driverName DriverName, table string, value any, fn02 EvalColumnFunc) (string, error) {
+func CreateInsertSQL(table string, value any, driverName DriverName, paramHolder ParamHolder) (string, error) {
 
 	initChar := "("
 	endChar := ")"
@@ -39,7 +39,7 @@ func CreateInsertSQL(driverName DriverName, table string, value any, fn02 EvalCo
 
 	var cont int
 	var valueSequence string
-	if valueSequence, cont, err = ParseColumnAsNameValueSequence(value, initChar, endChar, separator, 0, NonePkGeneratedColumnFilter, fn02); err != nil {
+	if valueSequence, cont, err = ParseColumnAsNameValueSequence(value, initChar, endChar, separator, 0, NonePkGeneratedColumnFilter, paramHolder.EvalValueOnly()); err != nil {
 		return "", err
 	}
 
@@ -51,7 +51,7 @@ func CreateInsertSQL(driverName DriverName, table string, value any, fn02 EvalCo
 		}
 
 		var pkValueSequence string
-		if pkValueSequence, _, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, cont, PkGeneratedColumnFilter, fn02); err != nil {
+		if pkValueSequence, _, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, cont, PkGeneratedColumnFilter, paramHolder.EvalValueOnly()); err != nil {
 			return "", err
 		}
 		returning = " RETURNING " + pkNameSequence + " INTO " + pkValueSequence
@@ -60,7 +60,7 @@ func CreateInsertSQL(driverName DriverName, table string, value any, fn02 EvalCo
 	return "INSERT INTO " + table + " " + nameSequence + " VALUES " + valueSequence + returning, nil
 }
 
-func CreateUpdateSQL(_ DriverName, table string, value any, fn01 ColumnFilterFunc, fn02 EvalColumnFunc) (string, error) {
+func CreateUpdateSQL(table string, value any, _ DriverName, paramHolder ParamHolder, fn01 ColumnFilterFunc) (string, error) {
 
 	separator := ", "
 	empty := ""
@@ -68,26 +68,26 @@ func CreateUpdateSQL(_ DriverName, table string, value any, fn01 ColumnFilterFun
 	var err error
 	var cont int
 	var nameSequence string
-	if nameSequence, cont, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, 0, ColumnFilter, fn02); err != nil {
+	if nameSequence, cont, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, 0, ColumnFilter, paramHolder.EvalNameValue()); err != nil {
 		return "", err
 	}
 
-	var valueSequence string
-	if valueSequence, _, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, cont, fn01, fn02); err != nil {
+	var whereSequence string
+	if whereSequence, _, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, cont, fn01, paramHolder.EvalNameValue()); err != nil {
 		return "", err
 	}
 
-	return "UPDATE " + table + " SET " + nameSequence + " WHERE " + valueSequence, nil
+	return "UPDATE " + table + " SET " + nameSequence + " WHERE " + whereSequence, nil
 }
 
-func CreateDeleteSQL(_ DriverName, table string, value any, fn01 ColumnFilterFunc, fn02 EvalColumnFunc) (string, error) {
+func CreateDeleteSQL(table string, value any, _ DriverName, paramHolder ParamHolder, fn01 ColumnFilterFunc) (string, error) {
 
 	separator := ", "
 	empty := ""
 
 	var err error
 	var valueSequence string
-	if valueSequence, _, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, 0, fn01, fn02); err != nil {
+	if valueSequence, _, err = ParseColumnAsNameValueSequence(value, empty, empty, separator, 0, fn01, paramHolder.EvalNameValue()); err != nil {
 		return "", err
 	}
 
