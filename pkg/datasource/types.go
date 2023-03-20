@@ -12,19 +12,10 @@ type RelationalDatasourceContext interface {
 	GetUrl() string
 }
 
-func BuildRelationalDatasourceContext(driverName feather_sql.DriverName, paramHolder feather_sql.ParamHolder,
-	url string, username string, password string, server string, service string) RelationalDatasourceContext {
-	return NewRelationalDatasourceContext(driverName, paramHolder, url, username, password, server, service)
-}
-
 //
 
 type OpenDatasourceFunc func(driverName, datasourceUrl string) (*sql.DB, error)
 
 type RelationalDatasource interface {
 	GetDatabase() (*sql.DB, error)
-}
-
-func BuildRelationalDatasource(datasourceContext RelationalDatasourceContext, openFunc OpenDatasourceFunc) RelationalDatasource {
-	return NewDefaultRelationalDatasource(datasourceContext, openFunc)
 }

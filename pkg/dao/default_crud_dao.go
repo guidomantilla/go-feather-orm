@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"go.uber.org/zap"
 
@@ -22,6 +23,18 @@ type DefaultCrudDao struct {
 }
 
 func NewDefaultCrudDao(datasourceContext datasource.RelationalDatasourceContext, table string, model any) *DefaultCrudDao {
+
+	if datasourceContext == nil {
+		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: datasourceContext is nil", table))
+	}
+
+	if strings.TrimSpace(table) == "" {
+		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: table is empty", table))
+	}
+
+	if model == nil {
+		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: model is nil", table))
+	}
 
 	driverName := datasourceContext.GetDriverName()
 	paramHolder := datasourceContext.GetParamHolder()

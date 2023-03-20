@@ -22,17 +22,18 @@ type RelationalTransactionHandler interface {
 	HandleTransaction(ctx context.Context, fn RelationalTransactionHandlerFunction) error
 }
 
-func BuildRelationalTransactionHandler(relationalDatasource datasource.RelationalDatasource) RelationalTransactionHandler {
-	return NewRelationalTransactionHandler(relationalDatasource)
-}
-
 type DefaultDBTransactionHandler struct {
 	relationalDatasource datasource.RelationalDatasource
 }
 
-func NewRelationalTransactionHandler(relationalDatasource datasource.RelationalDatasource) *DefaultDBTransactionHandler {
+func NewRelationalTransactionHandler(datasource datasource.RelationalDatasource) *DefaultDBTransactionHandler {
+
+	if datasource == nil {
+		zap.L().Fatal("server starting up - error setting up transaction handler: datasource is nil")
+	}
+
 	return &DefaultDBTransactionHandler{
-		relationalDatasource: relationalDatasource,
+		relationalDatasource: datasource,
 	}
 }
 

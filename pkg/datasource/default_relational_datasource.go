@@ -15,6 +15,14 @@ type DefaultRelationalDatasource struct {
 
 func NewDefaultRelationalDatasource(datasourceContext RelationalDatasourceContext, openFunc OpenDatasourceFunc) *DefaultRelationalDatasource {
 
+	if datasourceContext == nil {
+		zap.L().Fatal("server starting up - error setting up datasource: datasourceContext is nil")
+	}
+
+	if openFunc == nil {
+		zap.L().Fatal("server starting up - error setting up datasource: openFunc is nil")
+	}
+
 	return &DefaultRelationalDatasource{
 		driver:   datasourceContext.GetDriverName().String(),
 		url:      datasourceContext.GetUrl(),

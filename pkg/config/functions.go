@@ -41,9 +41,9 @@ func Init(targetPrefix string, environment environment.Environment, paramHolder 
 	service := environment.GetValue(targetPrefix + DatasourceService).AsString()
 	url := environment.GetValue(targetPrefix + DatasourceUrl).AsString()
 
-	_datasourceContext = datasource.BuildRelationalDatasourceContext(driver, paramHolder, url, username, password, server, service)
+	_datasourceContext = datasource.NewDefaultRelationalDatasourceContext(driver, paramHolder, url, username, password, server, service)
 
-	_datasource = datasource.BuildRelationalDatasource(_datasourceContext, sql.Open)
+	_datasource = datasource.NewDefaultRelationalDatasource(_datasourceContext, sql.Open)
 	return _datasource, _datasourceContext
 }
 

@@ -46,7 +46,8 @@ func (enum DriverName) ValueOf(driverName string) DriverName {
 type ParamHolder int
 
 const (
-	NamedParamHolder ParamHolder = iota
+	UnknownParamHolder ParamHolder = iota - 1
+	NamedParamHolder
 	NumberedParamHolder
 	QuestionedParamHolder
 )

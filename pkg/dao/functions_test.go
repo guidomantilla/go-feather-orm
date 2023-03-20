@@ -3,8 +3,13 @@ package dao
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"reflect"
 	"testing"
+
+	sqlmock "github.com/DATA-DOG/go-sqlmock"
+
+	"github.com/guidomantilla/go-feather-sql/pkg/transaction"
 )
 
 func TestWriteContext(t *testing.T) {
@@ -36,6 +41,59 @@ func TestWriteContext(t *testing.T) {
 }
 
 func TestReadContext(t *testing.T) {
+	sqlStatement := "some_sql_statement"
+	errContextPath := func() context.Context {
+		var err error
+		var db *sql.DB
+		var mock sqlmock.Sqlmock
+		if db, mock, err = sqlmock.New(); err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		mock.ExpectBegin()
+		mock.ExpectPrepare(sqlStatement).WillReturnError(errors.New("some_error"))
+		tx, _ := db.Begin()
+
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+
+		return txCtx
+	}
+	errQueryPath := func() context.Context {
+		var err error
+		var db *sql.DB
+		var mock sqlmock.Sqlmock
+		if db, mock, err = sqlmock.New(); err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		mock.ExpectBegin()
+		mock.ExpectPrepare(sqlStatement)
+		mock.ExpectQuery(sqlStatement).WillReturnError(errors.New("some_error"))
+		tx, _ := db.Begin()
+
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+
+		return txCtx
+	}
+	happyPath := func() context.Context {
+		var err error
+		var db *sql.DB
+		var mock sqlmock.Sqlmock
+		if db, mock, err = sqlmock.New(); err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		mock.ExpectBegin()
+		mock.ExpectPrepare(sqlStatement)
+		mock.ExpectQuery(sqlStatement).WillReturnRows(
+			sqlmock.NewRows([]string{"id", "uuid", "title", "content"}).
+				AddRow("1", "bea1b24d-0627-4ea0-aa2b-8af4c6c2a41c", "test", "test").
+				AddRow("1", "bea1b24d-0627-4ea0-aa2b-8af4c6c2a41c", "test", "test"),
+		)
+		tx, _ := db.Begin()
+
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+
+		return txCtx
+	}
+
 	type args struct {
 		ctx          context.Context
 		sqlStatement string
@@ -46,7 +104,46 @@ func TestReadContext(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Err Context Path",
+			args: args{
+				ctx:          errContextPath(),
+				sqlStatement: sqlStatement,
+				fn:           nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Err Query Path",
+			args: args{
+				ctx:          errQueryPath(),
+				sqlStatement: sqlStatement,
+				fn:           nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Err Fn Path",
+			args: args{
+				ctx:          happyPath(),
+				sqlStatement: sqlStatement,
+				fn: func(rows *sql.Rows) error {
+					return errors.New("some_error")
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "Happy Path",
+			args: args{
+				ctx:          happyPath(),
+				sqlStatement: sqlStatement,
+				fn: func(rows *sql.Rows) error {
+					return nil
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -58,6 +155,80 @@ func TestReadContext(t *testing.T) {
 }
 
 func TestReadRowContext(t *testing.T) {
+
+	sqlStatement := "some_sql_statement"
+	errContextPath := func() context.Context {
+		var err error
+		var db *sql.DB
+		var mock sqlmock.Sqlmock
+		if db, mock, err = sqlmock.New(); err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		mock.ExpectBegin()
+		mock.ExpectPrepare(sqlStatement).WillReturnError(errors.New("some_error"))
+		tx, _ := db.Begin()
+
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+
+		return txCtx
+	}
+	errRowScanPath := func() context.Context {
+		var err error
+		var db *sql.DB
+		var mock sqlmock.Sqlmock
+		if db, mock, err = sqlmock.New(); err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		mock.ExpectBegin()
+		mock.ExpectPrepare(sqlStatement)
+		mock.ExpectQuery(sqlStatement).WillReturnError(errors.New("some_error"))
+
+		tx, _ := db.Begin()
+
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+
+		return txCtx
+	}
+	errRowScanNoRowsPath := func() context.Context {
+		var err error
+		var db *sql.DB
+		var mock sqlmock.Sqlmock
+		if db, mock, err = sqlmock.New(); err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		mock.ExpectBegin()
+		mock.ExpectPrepare(sqlStatement)
+		mock.ExpectQuery(sqlStatement).WillReturnError(errors.New("sql: no rows in result set"))
+
+		tx, _ := db.Begin()
+
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+
+		return txCtx
+	}
+	happyPath := func() context.Context {
+		var err error
+		var db *sql.DB
+		var mock sqlmock.Sqlmock
+		if db, mock, err = sqlmock.New(); err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		mock.ExpectBegin()
+		mock.ExpectPrepare(sqlStatement)
+		mock.ExpectQuery(sqlStatement).WillReturnRows(
+			sqlmock.NewRows([]string{"id", "uuid", "title", "content"}).
+				AddRow("1", "bea1b24d-0627-4ea0-aa2b-8af4c6c2a41c", "test", "test").
+				AddRow("1", "bea1b24d-0627-4ea0-aa2b-8af4c6c2a41c", "test", "test"),
+		)
+		tx, _ := db.Begin()
+
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+
+		return txCtx
+	}
+
+	var id, uuid, title, content string
+
 	type args struct {
 		ctx          context.Context
 		sqlStatement string
@@ -69,7 +240,46 @@ func TestReadRowContext(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Err Context Path",
+			args: args{
+				ctx:          errContextPath(),
+				sqlStatement: sqlStatement,
+				key:          nil,
+				dest:         nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Err RowScan Path",
+			args: args{
+				ctx:          errRowScanPath(),
+				sqlStatement: sqlStatement,
+				key:          nil,
+				dest:         nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Err RowScan No Rows Path",
+			args: args{
+				ctx:          errRowScanNoRowsPath(),
+				sqlStatement: sqlStatement,
+				key:          nil,
+				dest:         nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Happy Path",
+			args: args{
+				ctx:          happyPath(),
+				sqlStatement: sqlStatement,
+				key:          nil,
+				dest:         []any{&id, &uuid, &title, &content},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -81,6 +291,43 @@ func TestReadRowContext(t *testing.T) {
 }
 
 func TestContext(t *testing.T) {
+
+	sqlStatement := "some_sql_statement"
+
+	errPreparePath := func() context.Context {
+		var err error
+		var db *sql.DB
+		var mock sqlmock.Sqlmock
+		if db, mock, err = sqlmock.New(); err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		mock.ExpectBegin()
+		mock.ExpectPrepare(sqlStatement).WillReturnError(errors.New("some_error"))
+		tx, _ := db.Begin()
+
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+
+		return txCtx
+	}
+
+	happyPath := func() context.Context {
+		var err error
+		var db *sql.DB
+		var mock sqlmock.Sqlmock
+		if db, mock, err = sqlmock.New(); err != nil {
+			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+		}
+		mock.ExpectBegin()
+		mock.ExpectPrepare(sqlStatement)
+		mock.ExpectExec(sqlStatement).WillReturnResult(sqlmock.NewResult(1, 1))
+
+		tx, _ := db.Begin()
+
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+
+		return txCtx
+	}
+
 	type args struct {
 		ctx          context.Context
 		sqlStatement string
@@ -91,7 +338,37 @@ func TestContext(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Err Prepare Path",
+			args: args{
+				ctx:          errPreparePath(),
+				sqlStatement: sqlStatement,
+				fn:           nil,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Err Fn Path",
+			args: args{
+				ctx:          happyPath(),
+				sqlStatement: sqlStatement,
+				fn: func(statement *sql.Stmt) error {
+					return errors.New("some_error")
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "Happy Path",
+			args: args{
+				ctx:          happyPath(),
+				sqlStatement: sqlStatement,
+				fn: func(statement *sql.Stmt) error {
+					return nil
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -103,6 +380,21 @@ func TestContext(t *testing.T) {
 }
 
 func Test_closeStatement(t *testing.T) {
+	var err error
+	var db *sql.DB
+	var mock sqlmock.Sqlmock
+	if db, mock, err = sqlmock.New(); err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	sqlStatement := "some_sql_statement"
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(sqlStatement).WillReturnCloseError(errors.New("some_error"))
+
+	tx, _ := db.Begin()
+	statement, _ := tx.Prepare(sqlStatement)
+
 	type args struct {
 		statement *sql.Stmt
 	}
@@ -110,7 +402,10 @@ func Test_closeStatement(t *testing.T) {
 		name string
 		args args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			args: args{statement: statement},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -120,6 +415,28 @@ func Test_closeStatement(t *testing.T) {
 }
 
 func Test_closeResultSet(t *testing.T) {
+
+	var err error
+	var db *sql.DB
+	var mock sqlmock.Sqlmock
+	if db, mock, err = sqlmock.New(); err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+
+	value := "something"
+
+	mock.ExpectBegin()
+	mock.ExpectPrepare(value)
+
+	mock.ExpectQuery(value).WillReturnRows(sqlmock.NewRows([]string{"id", "uuid", "title", "content"}).
+		AddRow("1", "bea1b24d-0627-4ea0-aa2b-8af4c6c2a41c", "test", "test").
+		AddRow("1", "bea1b24d-0627-4ea0-aa2b-8af4c6c2a41c", "test", "test").
+		CloseError(errors.New("some_error")))
+
+	tx, _ := db.Begin()
+	statement, _ := tx.Prepare(value)
+	rows, _ := statement.Query()
+
 	type args struct {
 		rows *sql.Rows
 	}
@@ -127,7 +444,10 @@ func Test_closeResultSet(t *testing.T) {
 		name string
 		args args
 	}{
-		// TODO: Add test cases.
+		{
+			name: "Happy Path",
+			args: args{rows: rows},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

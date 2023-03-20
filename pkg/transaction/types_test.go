@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"reflect"
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
@@ -12,34 +11,6 @@ import (
 
 	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
 )
-
-func TestBuildRelationalTransactionHandler(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
-	datasource2 := datasource.NewMockRelationalDatasource(ctrl)
-
-	type args struct {
-		relationalDatasource datasource.RelationalDatasource
-	}
-	tests := []struct {
-		name string
-		args args
-		want RelationalTransactionHandler
-	}{
-		{
-			name: "Only Path",
-			args: args{relationalDatasource: datasource2},
-			want: NewRelationalTransactionHandler(datasource2),
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := BuildRelationalTransactionHandler(tt.args.relationalDatasource); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("BuildRelationalTransactionHandler() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
 
 func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 
