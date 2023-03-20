@@ -3,6 +3,7 @@ package config
 import (
 	"database/sql"
 	"fmt"
+	"strings"
 
 	"github.com/guidomantilla/go-feather-commons/pkg/environment"
 	"go.uber.org/zap"
@@ -29,17 +30,48 @@ func Init(targetPrefix string, environment environment.Environment, paramHolder 
 
 	zap.L().Info("server starting up - setting up DB connection")
 
+	if strings.TrimSpace(targetPrefix) == "" {
+		zap.L().Fatal("server starting up - error setting up DB config: targetPrefix is empty")
+	}
+
+	if environment == nil {
+		zap.L().Fatal("server starting up - error setting up DB config: environment is nil")
+	}
+
+	if paramHolder == feather_sql.UnknownParamHolder {
+		zap.L().Fatal("server starting up - error setting up DB config: invalid param holder")
+	}
+
 	driverName := environment.GetValue(targetPrefix + DatasourceDriver).AsString()
 	driver := feather_sql.UnknownDriverName.ValueOf(driverName)
 	if driver == feather_sql.UnknownDriverName {
-		zap.L().Fatal("server starting up - error setting up DB connection: invalid driver name")
+		zap.L().Fatal("server starting up - error setting up DB config: invalid driver name")
+	}
+
+	url := environment.GetValue(targetPrefix + DatasourceUrl).AsString()
+	if strings.TrimSpace(url) == "" {
+		zap.L().Fatal("server starting up - error setting up DB config: url is empty")
 	}
 
 	username := environment.GetValue(targetPrefix + DatasourceUsername).AsString()
+	if strings.TrimSpace(username) == "" {
+		zap.L().Fatal("server starting up - error setting up DB config: username is empty")
+	}
+
 	password := environment.GetValue(targetPrefix + DatasourcePassword).AsString()
+	if strings.TrimSpace(password) == "" {
+		zap.L().Fatal("server starting up - error setting up DB config: password is empty")
+	}
+
 	server := environment.GetValue(targetPrefix + DatasourceServer).AsString()
+	if strings.TrimSpace(server) == "" {
+		zap.L().Fatal("server starting up - error setting up DB config: server is empty")
+	}
+
 	service := environment.GetValue(targetPrefix + DatasourceService).AsString()
-	url := environment.GetValue(targetPrefix + DatasourceUrl).AsString()
+	if strings.TrimSpace(service) == "" {
+		zap.L().Fatal("server starting up - error setting up DB config: service is empty")
+	}
 
 	_datasourceContext = datasource.NewDefaultRelationalDatasourceContext(driver, paramHolder, url, username, password, server, service)
 
