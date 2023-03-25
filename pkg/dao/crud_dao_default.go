@@ -25,15 +25,15 @@ type DefaultCrudDao struct {
 func NewDefaultCrudDao(datasourceContext datasource.RelationalDatasourceContext, table string, model any) *DefaultCrudDao {
 
 	if datasourceContext == nil {
-		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: datasourceContext is nil", table))
+		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: datasourceContext is nil", table))
 	}
 
 	if strings.TrimSpace(table) == "" {
-		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: table is empty", table))
+		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: table is empty", table))
 	}
 
 	if model == nil {
-		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: model is nil", table))
+		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: model is nil", table))
 	}
 
 	driverName := datasourceContext.GetDriverName()
@@ -41,27 +41,27 @@ func NewDefaultCrudDao(datasourceContext datasource.RelationalDatasourceContext,
 
 	statementCreate, err := feather_sql.CreateInsertSQL(table, model, driverName, paramHolder)
 	if err != nil {
-		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: %s", table, err.Error()))
+		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
 	}
 
 	statementUpdate, err := feather_sql.CreateUpdateSQL(table, model, driverName, paramHolder, feather_sql.PkColumnFilter)
 	if err != nil {
-		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: %s", table, err.Error()))
+		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
 	}
 
 	statementDelete, err := feather_sql.CreateDeleteSQL(table, model, driverName, paramHolder, feather_sql.PkColumnFilter)
 	if err != nil {
-		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: %s", table, err.Error()))
+		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
 	}
 
 	statementFindById, err := feather_sql.CreateSelectSQL(table, model, driverName, paramHolder, feather_sql.PkColumnFilter)
 	if err != nil {
-		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: %s", table, err.Error()))
+		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
 	}
 
 	statementFindAll, err := feather_sql.CreateSelectSQL(table, model, driverName, paramHolder, nil)
 	if err != nil {
-		zap.L().Fatal(fmt.Sprintf("server starting up - error setting up %s dao: %s", table, err.Error()))
+		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
 	}
 
 	return &DefaultCrudDao{

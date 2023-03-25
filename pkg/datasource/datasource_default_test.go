@@ -16,7 +16,7 @@ func TestNewDefaultRelationalDatasource(t *testing.T) {
 		return nil, nil
 	})
 	datasourceCtx := &DefaultRelationalDatasourceContext{
-		driverName:  feather_sql.UnknownDriverName,
+		driverName:  feather_sql.UndefinedDriverName,
 		paramHolder: feather_sql.NamedParamHolder,
 		url:         "some_usersome_passsome_serversome_service",
 	}
@@ -67,7 +67,7 @@ func TestNewDefaultRelationalDatasource(t *testing.T) {
 func TestDefaultRelationalDatasource_GetDatabase(t *testing.T) {
 
 	datasourceCtx := &DefaultRelationalDatasourceContext{
-		driverName:  feather_sql.UnknownDriverName,
+		driverName:  feather_sql.UndefinedDriverName,
 		paramHolder: feather_sql.NamedParamHolder,
 		url:         "some_usersome_passsome_serversome_service",
 	}

@@ -29,7 +29,7 @@ type DefaultDBTransactionHandler struct {
 func NewRelationalTransactionHandler(datasource datasource.RelationalDatasource) *DefaultDBTransactionHandler {
 
 	if datasource == nil {
-		zap.L().Fatal("server starting up - error setting up transaction handler: datasource is nil")
+		zap.L().Fatal("starting up - error setting up transaction handler: datasource is nil")
 	}
 
 	return &DefaultDBTransactionHandler{

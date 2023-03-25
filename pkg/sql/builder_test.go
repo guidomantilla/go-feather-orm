@@ -55,10 +55,11 @@ func TestCreateSelectSQL(t *testing.T) {
 		{
 			name: "Happy Path",
 			args: args{
-				in0:   0,
-				table: "some",
-				value: model{},
-				fn01:  ColumnFilter,
+				in0:         0,
+				table:       "some",
+				value:       model{},
+				paramHolder: NamedParamHolder,
+				fn01:        ColumnFilter,
 			},
 			want:    "SELECT id, name FROM some WHERE id = :id AND name = :name",
 			wantErr: false,
@@ -119,9 +120,10 @@ func TestCreateInsertSQL(t *testing.T) {
 		{
 			name: "Happy Non Oracle Path",
 			args: args{
-				driverName: MysqlDriverName,
-				table:      "some",
-				value:      model{},
+				driverName:  MysqlDriverName,
+				table:       "some",
+				paramHolder: NamedParamHolder,
+				value:       model{},
 			},
 			want:    "INSERT INTO some (id) VALUES (:id)",
 			wantErr: false,
@@ -139,9 +141,10 @@ func TestCreateInsertSQL(t *testing.T) {
 		{
 			name: "Happy Oracle Path",
 			args: args{
-				driverName: OracleDriverName,
-				table:      "some",
-				value:      model2{},
+				driverName:  OracleDriverName,
+				paramHolder: NamedParamHolder,
+				table:       "some",
+				value:       model2{},
 			},
 			want:    "INSERT INTO some (name) VALUES (:name) RETURNING id INTO :id",
 			wantErr: false,
@@ -201,10 +204,11 @@ func TestCreateUpdateSQL(t *testing.T) {
 		{
 			name: "Happy Path",
 			args: args{
-				in0:   0,
-				table: "some",
-				value: model{},
-				fn01:  ColumnFilter,
+				in0:         0,
+				table:       "some",
+				paramHolder: NamedParamHolder,
+				value:       model{},
+				fn01:        ColumnFilter,
 			},
 			want:    "UPDATE some SET id = :id WHERE id = :id",
 			wantErr: false,
@@ -253,10 +257,11 @@ func TestCreateDeleteSQL(t *testing.T) {
 		{
 			name: "Happy Path",
 			args: args{
-				in0:   0,
-				table: "some",
-				value: model{},
-				fn01:  ColumnFilter,
+				in0:         0,
+				table:       "some",
+				paramHolder: NamedParamHolder,
+				value:       model{},
+				fn01:        ColumnFilter,
 			},
 			want:    "DELETE FROM some WHERE id = :id",
 			wantErr: false,

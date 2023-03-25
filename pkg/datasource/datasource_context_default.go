@@ -17,32 +17,34 @@ type DefaultRelationalDatasourceContext struct {
 func NewDefaultRelationalDatasourceContext(driverName feather_sql.DriverName, paramHolder feather_sql.ParamHolder,
 	url string, username string, password string, server string, service string) *DefaultRelationalDatasourceContext {
 
-	if driverName == feather_sql.UnknownDriverName {
-		zap.L().Fatal("server starting up - error setting up datasourceContext: driverName is unknown")
+	driverName = feather_sql.UndefinedDriverName.ValueFromCardinal(int(driverName))
+	if driverName == feather_sql.UndefinedDriverName {
+		zap.L().Fatal("starting up - error setting up datasourceContext: driverName undefined")
 	}
 
-	if paramHolder == feather_sql.UnknownParamHolder {
-		zap.L().Fatal("server starting up - error setting up datasourceContext: paramHolder is unknown")
+	paramHolder = feather_sql.UndefinedParamHolder.ValueFromCardinal(int(paramHolder))
+	if paramHolder == feather_sql.UndefinedParamHolder {
+		zap.L().Fatal("starting up - error setting up datasourceContext: paramHolder undefined")
 	}
 
 	if strings.TrimSpace(url) == "" {
-		zap.L().Fatal("server starting up - error setting up datasourceContext: url is empty")
+		zap.L().Fatal("starting up - error setting up datasourceContext: url is empty")
 	}
 
 	if strings.TrimSpace(username) == "" {
-		zap.L().Fatal("server starting up - error setting up datasourceContext: username is empty")
+		zap.L().Fatal("starting up - error setting up datasourceContext: username is empty")
 	}
 
 	if strings.TrimSpace(password) == "" {
-		zap.L().Fatal("server starting up - error setting up datasourceContext: password is empty")
+		zap.L().Fatal("starting up - error setting up datasourceContext: password is empty")
 	}
 
 	if strings.TrimSpace(server) == "" {
-		zap.L().Fatal("server starting up - error setting up datasourceContext: server is empty")
+		zap.L().Fatal("starting up - error setting up datasourceContext: server is empty")
 	}
 
 	if strings.TrimSpace(service) == "" {
-		zap.L().Fatal("server starting up - error setting up datasourceContext: service is empty")
+		zap.L().Fatal("starting up - error setting up datasourceContext: service is empty")
 	}
 
 	url = strings.Replace(url, ":username", username, 1)

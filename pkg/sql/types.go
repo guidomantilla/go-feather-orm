@@ -1,7 +1,9 @@
 package sql
 
+import "strings"
+
 const (
-	UnknownDriverName DriverName = iota - 1
+	UndefinedDriverName DriverName = iota
 	OracleDriverName
 	MysqlDriverName
 	PostgresDriverName
@@ -14,7 +16,7 @@ type DriverName int
 func (enum DriverName) String() string {
 
 	switch enum {
-	case UnknownDriverName:
+	case UndefinedDriverName:
 		return "unknown"
 	case OracleDriverName:
 		return "oracle"
@@ -26,19 +28,30 @@ func (enum DriverName) String() string {
 	return "unknown"
 }
 
-func (enum DriverName) ValueOf(driverName string) DriverName {
+func (enum DriverName) ValueFromName(driverName string) DriverName {
 
-	switch driverName {
-	case UnknownDriverName.String():
-		return UnknownDriverName
-	case OracleDriverName.String():
+	switch strings.ToLower(driverName) {
+	case "oracle":
 		return OracleDriverName
-	case MysqlDriverName.String():
+	case "mysql":
 		return MysqlDriverName
-	case PostgresDriverName.String():
+	case "pgx":
 		return PostgresDriverName
 	}
-	return UnknownDriverName
+	return UndefinedDriverName
+}
+
+func (enum DriverName) ValueFromCardinal(value int) DriverName {
+
+	switch value {
+	case int(OracleDriverName):
+		return OracleDriverName
+	case int(MysqlDriverName):
+		return MysqlDriverName
+	case int(PostgresDriverName):
+		return PostgresDriverName
+	}
+	return UndefinedDriverName
 }
 
 //
@@ -46,7 +59,7 @@ func (enum DriverName) ValueOf(driverName string) DriverName {
 type ParamHolder int
 
 const (
-	UnknownParamHolder ParamHolder = iota - 1
+	UndefinedParamHolder ParamHolder = iota
 	NamedParamHolder
 	NumberedParamHolder
 	QuestionedParamHolder
@@ -74,4 +87,17 @@ func (enum ParamHolder) EvalValueOnly() EvalColumnFunc {
 		return EvalValueOnlyQuestioned
 	}
 	return nil
+}
+
+func (enum ParamHolder) ValueFromCardinal(value int) ParamHolder {
+
+	switch value {
+	case int(NamedParamHolder):
+		return NamedParamHolder
+	case int(NumberedParamHolder):
+		return NumberedParamHolder
+	case int(QuestionedParamHolder):
+		return QuestionedParamHolder
+	}
+	return UndefinedParamHolder
 }

@@ -12,9 +12,9 @@ func TestDriverName_String(t *testing.T) {
 		want string
 	}{
 		{
-			name: "UnknownDriverName Path",
-			enum: UnknownDriverName,
-			want: UnknownDriverName.String(),
+			name: "UndefinedDriverName Path",
+			enum: UndefinedDriverName,
+			want: UndefinedDriverName.String(),
 		},
 		{
 			name: "OracleDriverName Path",
@@ -34,7 +34,7 @@ func TestDriverName_String(t *testing.T) {
 		{
 			name: "Nil Path",
 			enum: -2,
-			want: UnknownDriverName.String(),
+			want: UndefinedDriverName.String(),
 		},
 	}
 	for _, tt := range tests {
@@ -57,10 +57,10 @@ func TestDriverName_ValueOf(t *testing.T) {
 		want DriverName
 	}{
 		{
-			name: "UnknownDriverName Path",
-			enum: UnknownDriverName,
-			args: args{driverName: UnknownDriverName.String()},
-			want: UnknownDriverName,
+			name: "UndefinedDriverName Path",
+			enum: UndefinedDriverName,
+			args: args{driverName: UndefinedDriverName.String()},
+			want: UndefinedDriverName,
 		},
 		{
 			name: "OracleDriverName Path",
@@ -85,12 +85,12 @@ func TestDriverName_ValueOf(t *testing.T) {
 			name: "Nil Path",
 			enum: -2,
 			args: args{driverName: ""},
-			want: UnknownDriverName,
+			want: UndefinedDriverName,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.enum.ValueOf(tt.args.driverName); got != tt.want {
+			if got := tt.enum.ValueFromName(tt.args.driverName); got != tt.want {
 				t.Errorf("DriverName.ValueOf() = %v, want %v", got, tt.want)
 			}
 		})
