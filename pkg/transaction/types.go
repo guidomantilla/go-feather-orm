@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
 	"go.uber.org/zap"
 
 	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
@@ -53,7 +52,7 @@ func (handler *DefaultDBTransactionHandler) HandleTransaction(ctx context.Contex
 
 	defer func() {
 		if p := recover(); p != nil {
-			fmt.Println(p)
+			zap.L().Error(fmt.Sprintf("recovering from panic: %v", p))
 			handleError(tx.Rollback())
 		} else if err != nil {
 			handleError(tx.Rollback())

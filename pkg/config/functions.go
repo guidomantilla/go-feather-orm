@@ -75,7 +75,6 @@ func Init(targetPrefix string, environment environment.Environment, paramHolder 
 	}
 
 	_datasourceContext = datasource.NewDefaultRelationalDatasourceContext(driver, paramHolder, url, username, password, server, service)
-
 	_datasource = datasource.NewDefaultRelationalDatasource(_datasourceContext, sql.Open)
 	return _datasource, _datasourceContext
 }

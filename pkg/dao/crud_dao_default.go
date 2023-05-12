@@ -129,7 +129,6 @@ func (dao *DefaultCrudDao) ExistsById(ctx context.Context, id any, args ...any) 
 	}
 
 	return true
-
 }
 
 func (dao *DefaultCrudDao) FindAll(ctx context.Context, fn ReadFunction) error {
