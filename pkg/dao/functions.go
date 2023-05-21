@@ -99,7 +99,7 @@ func Context(ctx context.Context, sqlStatement string, fn Function) error {
 
 	var err error
 	var statement *sql.Stmt
-	var tx = ctx.Value(transaction.RelationalTransactionContext{}).(*sql.Tx)
+	var tx = ctx.Value(transaction.RelationalTransactionCtxKey{}).(*sql.Tx)
 	if statement, err = tx.Prepare(sqlStatement); err != nil {
 		return err
 	}

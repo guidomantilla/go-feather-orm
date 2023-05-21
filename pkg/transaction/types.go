@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+
 	"go.uber.org/zap"
 
 	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
@@ -13,7 +14,7 @@ var (
 	_ RelationalTransactionHandler = (*DefaultDBTransactionHandler)(nil)
 )
 
-type RelationalTransactionContext struct{}
+type RelationalTransactionCtxKey struct{}
 
 type RelationalTransactionHandlerFunction func(ctx context.Context, tx *sql.Tx) error
 
@@ -61,7 +62,7 @@ func (handler *DefaultDBTransactionHandler) HandleTransaction(ctx context.Contex
 		}
 	}()
 
-	txCtx := context.WithValue(ctx, RelationalTransactionContext{}, tx)
+	txCtx := context.WithValue(ctx, RelationalTransactionCtxKey{}, tx)
 	err = fn(txCtx, tx)
 	return err
 }

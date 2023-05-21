@@ -53,7 +53,7 @@ func TestReadContext(t *testing.T) {
 		mock.ExpectPrepare(sqlStatement).WillReturnError(errors.New("some_error"))
 		tx, _ := db.Begin()
 
-		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionCtxKey{}, tx)
 
 		return txCtx
 	}
@@ -69,7 +69,7 @@ func TestReadContext(t *testing.T) {
 		mock.ExpectQuery(sqlStatement).WillReturnError(errors.New("some_error"))
 		tx, _ := db.Begin()
 
-		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionCtxKey{}, tx)
 
 		return txCtx
 	}
@@ -89,7 +89,7 @@ func TestReadContext(t *testing.T) {
 		)
 		tx, _ := db.Begin()
 
-		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionCtxKey{}, tx)
 
 		return txCtx
 	}
@@ -168,7 +168,7 @@ func TestReadRowContext(t *testing.T) {
 		mock.ExpectPrepare(sqlStatement).WillReturnError(errors.New("some_error"))
 		tx, _ := db.Begin()
 
-		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionCtxKey{}, tx)
 
 		return txCtx
 	}
@@ -185,7 +185,7 @@ func TestReadRowContext(t *testing.T) {
 
 		tx, _ := db.Begin()
 
-		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionCtxKey{}, tx)
 
 		return txCtx
 	}
@@ -202,7 +202,7 @@ func TestReadRowContext(t *testing.T) {
 
 		tx, _ := db.Begin()
 
-		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionCtxKey{}, tx)
 
 		return txCtx
 	}
@@ -222,7 +222,7 @@ func TestReadRowContext(t *testing.T) {
 		)
 		tx, _ := db.Begin()
 
-		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionCtxKey{}, tx)
 
 		return txCtx
 	}
@@ -305,7 +305,7 @@ func TestContext(t *testing.T) {
 		mock.ExpectPrepare(sqlStatement).WillReturnError(errors.New("some_error"))
 		tx, _ := db.Begin()
 
-		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionCtxKey{}, tx)
 
 		return txCtx
 	}
@@ -323,7 +323,7 @@ func TestContext(t *testing.T) {
 
 		tx, _ := db.Begin()
 
-		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionContext{}, tx)
+		txCtx := context.WithValue(context.TODO(), transaction.RelationalTransactionCtxKey{}, tx)
 
 		return txCtx
 	}
