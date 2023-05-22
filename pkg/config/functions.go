@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/guidomantilla/go-feather-commons/pkg/environment"
+	feather_commons_environment "github.com/guidomantilla/go-feather-commons/pkg/environment"
 	"go.uber.org/zap"
 
-	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
+	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
@@ -22,13 +22,11 @@ const (
 )
 
 var (
-	_datasource        datasource.RelationalDatasource
-	_datasourceContext datasource.RelationalDatasourceContext
+	_datasource        feather_sql_datasource.RelationalDatasource
+	_datasourceContext feather_sql_datasource.RelationalDatasourceContext
 )
 
-func Init(targetPrefix string, environment environment.Environment, paramHolder feather_sql.ParamHolder) (datasource.RelationalDatasource, datasource.RelationalDatasourceContext) {
-
-	zap.L().Info("starting up - setting up DB connection")
+func Init(targetPrefix string, environment feather_commons_environment.Environment, paramHolder feather_sql.ParamHolder) (feather_sql_datasource.RelationalDatasource, feather_sql_datasource.RelationalDatasourceContext) {
 
 	if strings.TrimSpace(targetPrefix) == "" {
 		zap.L().Fatal("starting up - error setting up DB config: targetPrefix is empty")
@@ -74,8 +72,8 @@ func Init(targetPrefix string, environment environment.Environment, paramHolder 
 		zap.L().Fatal("starting up - error setting up DB config: service is empty")
 	}
 
-	_datasourceContext = datasource.NewDefaultRelationalDatasourceContext(driver, paramHolder, url, username, password, server, service)
-	_datasource = datasource.NewDefaultRelationalDatasource(_datasourceContext, sql.Open)
+	_datasourceContext = feather_sql_datasource.NewDefaultRelationalDatasourceContext(driver, paramHolder, url, username, password, server, service)
+	_datasource = feather_sql_datasource.NewDefaultRelationalDatasource(_datasourceContext, sql.Open)
 	return _datasource, _datasourceContext
 }
 

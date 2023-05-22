@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
+	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
@@ -22,7 +22,7 @@ type DefaultCrudDao struct {
 	statementFindAll  string
 }
 
-func NewDefaultCrudDao(datasourceContext datasource.RelationalDatasourceContext, table string, model any) *DefaultCrudDao {
+func NewDefaultCrudDao(datasourceContext feather_sql_datasource.RelationalDatasourceContext, table string, model any) *DefaultCrudDao {
 
 	if datasourceContext == nil {
 		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: datasourceContext is nil", table))

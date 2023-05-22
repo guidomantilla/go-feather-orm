@@ -9,7 +9,7 @@ import (
 	"go.uber.org/zap"
 
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
-	"github.com/guidomantilla/go-feather-sql/pkg/transaction"
+	feather_sql_transaction "github.com/guidomantilla/go-feather-sql/pkg/transaction"
 )
 
 const (
@@ -99,7 +99,7 @@ func Context(ctx context.Context, sqlStatement string, fn Function) error {
 
 	var err error
 	var statement *sql.Stmt
-	var tx = ctx.Value(transaction.RelationalTransactionCtxKey{}).(*sql.Tx)
+	var tx = ctx.Value(feather_sql_transaction.RelationalTransactionCtxKey{}).(*sql.Tx)
 	if statement, err = tx.Prepare(sqlStatement); err != nil {
 		return err
 	}

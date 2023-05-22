@@ -9,7 +9,7 @@ import (
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
 
-	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
+	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 )
 
 func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
@@ -18,7 +18,7 @@ func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 	defer ctrl.Finish()
 
 	errGetDatabasePath := func() *DefaultDBTransactionHandler {
-		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(nil, errors.New("some_error"))
 		return NewRelationalTransactionHandler(datasource)
 	}
@@ -26,7 +26,7 @@ func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 	errBeginPath := func() *DefaultDBTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin().WillReturnError(errors.New("some_error"))
-		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
 		return NewRelationalTransactionHandler(datasource)
 	}
@@ -34,7 +34,7 @@ func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 	errDeferPath := func() *DefaultDBTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
-		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
 		return NewRelationalTransactionHandler(datasource)
 	}
@@ -43,7 +43,7 @@ func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
 		sqlMock.ExpectRollback()
-		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
 		return NewRelationalTransactionHandler(datasource)
 	}
@@ -51,7 +51,7 @@ func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 	happyPath := func() *DefaultDBTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
-		datasource := datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
 		return NewRelationalTransactionHandler(datasource)
 	}

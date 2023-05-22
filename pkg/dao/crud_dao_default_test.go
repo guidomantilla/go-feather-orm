@@ -5,12 +5,12 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
+	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 )
 
 func TestNewDefaultCrudDao(t *testing.T) {
 	type args struct {
-		datasourceContext datasource.RelationalDatasourceContext
+		datasourceContext feather_sql_datasource.RelationalDatasourceContext
 		table             string
 		model             any
 	}

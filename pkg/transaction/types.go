@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
+	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 )
 
 var (
@@ -23,10 +23,10 @@ type RelationalTransactionHandler interface {
 }
 
 type DefaultDBTransactionHandler struct {
-	relationalDatasource datasource.RelationalDatasource
+	relationalDatasource feather_sql_datasource.RelationalDatasource
 }
 
-func NewRelationalTransactionHandler(datasource datasource.RelationalDatasource) *DefaultDBTransactionHandler {
+func NewRelationalTransactionHandler(datasource feather_sql_datasource.RelationalDatasource) *DefaultDBTransactionHandler {
 
 	if datasource == nil {
 		zap.L().Fatal("starting up - error setting up transactionHandler: datasource is nil")

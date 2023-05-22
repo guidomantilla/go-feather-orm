@@ -4,23 +4,23 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/guidomantilla/go-feather-commons/pkg/environment"
+	feather_commons_environment "github.com/guidomantilla/go-feather-commons/pkg/environment"
 
-	"github.com/guidomantilla/go-feather-sql/pkg/datasource"
+	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
 func TestInit(t *testing.T) {
 	type args struct {
 		targetPrefix string
-		environment  environment.Environment
+		environment  feather_commons_environment.Environment
 		paramHolder  feather_sql.ParamHolder
 	}
 	tests := []struct {
 		name  string
 		args  args
-		want  datasource.RelationalDatasource
-		want1 datasource.RelationalDatasourceContext
+		want  feather_sql_datasource.RelationalDatasource
+		want1 feather_sql_datasource.RelationalDatasourceContext
 	}{
 		// TODO: Add test cases.
 	}
