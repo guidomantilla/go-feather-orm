@@ -41,9 +41,9 @@ func (enum DriverName) ValueFromName(driverName string) DriverName {
 	return UndefinedDriverName
 }
 
-func (enum DriverName) ValueFromCardinal(value int) DriverName {
+func (enum DriverName) ValueFromCardinal(driver int) DriverName {
 
-	switch value {
+	switch driver {
 	case int(OracleDriverName):
 		return OracleDriverName
 	case int(MysqlDriverName):
@@ -89,9 +89,37 @@ func (enum ParamHolder) EvalValueOnly() EvalColumnFunc {
 	return nil
 }
 
-func (enum ParamHolder) ValueFromCardinal(value int) ParamHolder {
+func (enum ParamHolder) String() string {
 
-	switch value {
+	switch enum {
+	case UndefinedParamHolder:
+		return "unknown"
+	case NamedParamHolder:
+		return "named"
+	case NumberedParamHolder:
+		return "numbered"
+	case QuestionedParamHolder:
+		return "questioned"
+	}
+	return "unknown"
+}
+
+func (enum ParamHolder) ValueFromName(paramHolderName string) ParamHolder {
+
+	switch strings.ToLower(paramHolderName) {
+	case "named":
+		return NamedParamHolder
+	case "numbered":
+		return NumberedParamHolder
+	case "questioned":
+		return QuestionedParamHolder
+	}
+	return UndefinedParamHolder
+}
+
+func (enum ParamHolder) ValueFromCardinal(paramHolder int) ParamHolder {
+
+	switch paramHolder {
 	case int(NamedParamHolder):
 		return NamedParamHolder
 	case int(NumberedParamHolder):
