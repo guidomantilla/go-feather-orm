@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -43,7 +44,7 @@ func WriteContext(ctx context.Context, sqlStatement string, args ...any) (*int64
 		return nil
 	})
 	if err != nil {
-		return nil, err
+		return nil, ErrWriteContextFailed(errors.New(sqlStatement), err)
 	}
 
 	return &serial, nil
@@ -66,7 +67,7 @@ func ReadContext(ctx context.Context, sqlStatement string, fn ReadFunction) erro
 		return nil
 	})
 	if err != nil {
-		return err
+		return ErrReadContextFailed(errors.New(sqlStatement), err)
 	}
 
 	return nil
@@ -87,7 +88,7 @@ func ReadRowContext(ctx context.Context, sqlStatement string, key any, dest ...a
 		return nil
 	})
 	if err != nil {
-		return err
+		return ErrReadRowContextFailed(errors.New(sqlStatement), err)
 	}
 
 	return nil
@@ -101,12 +102,12 @@ func Context(ctx context.Context, sqlStatement string, fn Function) error {
 	var statement *sql.Stmt
 	var tx = ctx.Value(feather_sql_transaction.RelationalTransactionCtxKey{}).(*sql.Tx)
 	if statement, err = tx.Prepare(sqlStatement); err != nil {
-		return err
+		return ErrContextFailed(err)
 	}
 	defer closeStatement(statement)
 
 	if err = fn(statement); err != nil {
-		return err
+		return ErrContextFailed(errors.New(sqlStatement), err)
 	}
 	return nil
 }

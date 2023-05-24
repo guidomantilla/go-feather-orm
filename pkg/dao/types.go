@@ -4,6 +4,10 @@ import (
 	"context"
 )
 
+var (
+	_ CrudDao = (*DefaultCrudDao)(nil)
+)
+
 type CrudDao interface {
 	Save(ctx context.Context, args ...any) (*int64, error)
 	Update(ctx context.Context, args ...any) error

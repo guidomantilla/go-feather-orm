@@ -38,14 +38,14 @@ func (datasource *DefaultRelationalDatasource) GetDatabase() (*sql.DB, error) {
 	if datasource.database == nil {
 		if datasource.database, err = datasource.openFunc(datasource.driver, datasource.url); err != nil {
 			zap.L().Error(err.Error())
-			return nil, err
+			return nil, ErrDBConnectionFailed(err)
 		}
 	}
 
 	if err = datasource.database.Ping(); err != nil {
 		if datasource.database, err = datasource.openFunc(datasource.driver, datasource.url); err != nil {
 			zap.L().Error(err.Error())
-			return nil, err
+			return nil, ErrDBConnectionFailed(err)
 		}
 	}
 

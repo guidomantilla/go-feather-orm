@@ -6,6 +6,11 @@ import (
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
+var (
+	_ RelationalDatasourceContext = (*DefaultRelationalDatasourceContext)(nil)
+	_ RelationalDatasource        = (*DefaultRelationalDatasource)(nil)
+)
+
 type RelationalDatasourceContext interface {
 	GetDriverName() feather_sql.DriverName
 	GetParamHolder() feather_sql.ParamHolder

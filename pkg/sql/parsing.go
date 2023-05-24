@@ -1,7 +1,6 @@
 package sql
 
 import (
-	"errors"
 	"strconv"
 	"strings"
 )
@@ -15,7 +14,7 @@ func ParseColumnAsNameValueSequence(value any, initChar string, endChar string, 
 	}
 
 	if len(columnNames) == 0 {
-		return "", 0, errors.New("value (any - interface{}) not tagged")
+		return "", 0, ErrAnyNotTagged
 	}
 
 	if fn02 == nil {

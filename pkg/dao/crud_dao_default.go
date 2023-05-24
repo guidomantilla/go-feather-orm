@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -15,6 +16,7 @@ type DefaultCrudDao struct {
 	//datasourceContext datasource.RelationalDatasourceContext
 	driverName        feather_sql.DriverName
 	paramHolder       feather_sql.ParamHolder
+	table             string
 	statementCreate   string
 	statementUpdate   string
 	statementDelete   string
@@ -65,6 +67,7 @@ func NewDefaultCrudDao(datasourceContext feather_sql_datasource.RelationalDataso
 	}
 
 	return &DefaultCrudDao{
+		table:             table,
 		driverName:        driverName,
 		paramHolder:       paramHolder,
 		statementCreate:   statementCreate,
@@ -81,7 +84,7 @@ func (dao *DefaultCrudDao) Save(ctx context.Context, args ...any) (*int64, error
 	var serial *int64
 	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
 	if serial, err = WriteContext(ctx, dao.statementCreate, args...); err != nil {
-		return nil, err
+		return nil, ErrSaveFailed(errors.New(dao.table), err)
 	}
 
 	return serial, nil
@@ -92,7 +95,7 @@ func (dao *DefaultCrudDao) Update(ctx context.Context, args ...any) error {
 	var err error
 	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
 	if _, err = WriteContext(ctx, dao.statementUpdate, args...); err != nil {
-		return err
+		return ErrUpdateFailed(errors.New(dao.table), err)
 	}
 
 	return nil
@@ -103,7 +106,7 @@ func (dao *DefaultCrudDao) Delete(ctx context.Context, id any) error {
 	var err error
 	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
 	if _, err = WriteContext(ctx, dao.statementDelete, id); err != nil {
-		return err
+		return ErrDeleteFailed(errors.New(dao.table), err)
 	}
 
 	return nil
@@ -114,7 +117,7 @@ func (dao *DefaultCrudDao) FindById(ctx context.Context, id any, args ...any) er
 	var err error
 	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
 	if err = ReadRowContext(ctx, dao.statementFindById, id, args...); err != nil {
-		return err
+		return ErrFindByIdFailed(errors.New(dao.table), err)
 	}
 
 	return nil
@@ -136,7 +139,7 @@ func (dao *DefaultCrudDao) FindAll(ctx context.Context, fn ReadFunction) error {
 	var err error
 	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
 	if err = ReadContext(ctx, dao.statementFindAll, fn); err != nil {
-		return err
+		return ErrFindAllFailed(errors.New(dao.table), err)
 	}
 
 	return nil
