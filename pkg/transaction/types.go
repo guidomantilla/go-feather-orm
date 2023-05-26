@@ -11,35 +11,35 @@ import (
 )
 
 var (
-	_ RelationalTransactionHandler = (*DefaultDBTransactionHandler)(nil)
+	_ TransactionHandler = (*DefaultDBTransactionHandler)(nil)
 )
 
-type RelationalTransactionCtxKey struct{}
+type TransactionCtxKey struct{}
 
-type RelationalTransactionHandlerFunction func(ctx context.Context, tx *sql.Tx) error
+type TransactionHandlerFunction func(ctx context.Context, tx *sql.Tx) error
 
-type RelationalTransactionHandler interface {
-	HandleTransaction(ctx context.Context, fn RelationalTransactionHandlerFunction) error
+type TransactionHandler interface {
+	HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error
 }
 
 type DefaultDBTransactionHandler struct {
-	relationalDatasource feather_sql_datasource.RelationalDatasource
+	Datasource feather_sql_datasource.Datasource
 }
 
-func NewRelationalTransactionHandler(datasource feather_sql_datasource.RelationalDatasource) *DefaultDBTransactionHandler {
+func NewTransactionHandler(datasource feather_sql_datasource.Datasource) *DefaultDBTransactionHandler {
 
 	if datasource == nil {
 		zap.L().Fatal("starting up - error setting up transactionHandler: datasource is nil")
 	}
 
 	return &DefaultDBTransactionHandler{
-		relationalDatasource: datasource,
+		Datasource: datasource,
 	}
 }
 
-func (handler *DefaultDBTransactionHandler) HandleTransaction(ctx context.Context, fn RelationalTransactionHandlerFunction) error {
+func (handler *DefaultDBTransactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error {
 
-	db, err := handler.relationalDatasource.GetDatabase()
+	db, err := handler.Datasource.GetDatabase()
 	if err != nil {
 		zap.L().Error(err.Error())
 		return err
@@ -62,7 +62,7 @@ func (handler *DefaultDBTransactionHandler) HandleTransaction(ctx context.Contex
 		}
 	}()
 
-	txCtx := context.WithValue(ctx, RelationalTransactionCtxKey{}, tx)
+	txCtx := context.WithValue(ctx, TransactionCtxKey{}, tx)
 	err = fn(txCtx, tx)
 	return err
 }

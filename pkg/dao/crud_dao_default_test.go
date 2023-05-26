@@ -10,7 +10,7 @@ import (
 
 func TestNewDefaultCrudDao(t *testing.T) {
 	type args struct {
-		datasourceContext feather_sql_datasource.RelationalDatasourceContext
+		datasourceContext feather_sql_datasource.DatasourceContext
 		table             string
 		model             any
 	}

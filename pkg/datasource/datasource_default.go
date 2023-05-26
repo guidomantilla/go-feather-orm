@@ -6,14 +6,14 @@ import (
 	"go.uber.org/zap"
 )
 
-type DefaultRelationalDatasource struct {
+type DefaultDatasource struct {
 	driver   string
 	url      string
 	database *sql.DB
 	openFunc OpenDatasourceFunc
 }
 
-func NewDefaultRelationalDatasource(datasourceContext RelationalDatasourceContext, openFunc OpenDatasourceFunc) *DefaultRelationalDatasource {
+func NewDefaultDatasource(datasourceContext DatasourceContext, openFunc OpenDatasourceFunc) *DefaultDatasource {
 
 	if datasourceContext == nil {
 		zap.L().Fatal("starting up - error setting up datasource: datasourceContext is nil")
@@ -23,7 +23,7 @@ func NewDefaultRelationalDatasource(datasourceContext RelationalDatasourceContex
 		zap.L().Fatal("starting up - error setting up datasource: openFunc is nil")
 	}
 
-	return &DefaultRelationalDatasource{
+	return &DefaultDatasource{
 		driver:   datasourceContext.GetDriverName().String(),
 		url:      datasourceContext.GetUrl(),
 		database: nil,
@@ -31,7 +31,7 @@ func NewDefaultRelationalDatasource(datasourceContext RelationalDatasourceContex
 	}
 }
 
-func (datasource *DefaultRelationalDatasource) GetDatabase() (*sql.DB, error) {
+func (datasource *DefaultDatasource) GetDatabase() (*sql.DB, error) {
 
 	var err error
 

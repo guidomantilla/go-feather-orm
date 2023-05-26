@@ -11,31 +11,31 @@ import (
 	gomock "github.com/golang/mock/gomock"
 )
 
-// MockRelationalTransactionHandler is a mock of RelationalTransactionHandler interface.
-type MockRelationalTransactionHandler struct {
+// MockTransactionHandler is a mock of TransactionHandler interface.
+type MockTransactionHandler struct {
 	ctrl     *gomock.Controller
-	recorder *MockRelationalTransactionHandlerMockRecorder
+	recorder *MockTransactionHandlerMockRecorder
 }
 
-// MockRelationalTransactionHandlerMockRecorder is the mock recorder for MockRelationalTransactionHandler.
-type MockRelationalTransactionHandlerMockRecorder struct {
-	mock *MockRelationalTransactionHandler
+// MockTransactionHandlerMockRecorder is the mock recorder for MockTransactionHandler.
+type MockTransactionHandlerMockRecorder struct {
+	mock *MockTransactionHandler
 }
 
-// NewMockRelationalTransactionHandler creates a new mock instance.
-func NewMockRelationalTransactionHandler(ctrl *gomock.Controller) *MockRelationalTransactionHandler {
-	mock := &MockRelationalTransactionHandler{ctrl: ctrl}
-	mock.recorder = &MockRelationalTransactionHandlerMockRecorder{mock}
+// NewMockTransactionHandler creates a new mock instance.
+func NewMockTransactionHandler(ctrl *gomock.Controller) *MockTransactionHandler {
+	mock := &MockTransactionHandler{ctrl: ctrl}
+	mock.recorder = &MockTransactionHandlerMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockRelationalTransactionHandler) EXPECT() *MockRelationalTransactionHandlerMockRecorder {
+func (m *MockTransactionHandler) EXPECT() *MockTransactionHandlerMockRecorder {
 	return m.recorder
 }
 
 // HandleTransaction mocks base method.
-func (m *MockRelationalTransactionHandler) HandleTransaction(ctx context.Context, fn RelationalTransactionHandlerFunction) error {
+func (m *MockTransactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "HandleTransaction", ctx, fn)
 	ret0, _ := ret[0].(error)
@@ -43,7 +43,7 @@ func (m *MockRelationalTransactionHandler) HandleTransaction(ctx context.Context
 }
 
 // HandleTransaction indicates an expected call of HandleTransaction.
-func (mr *MockRelationalTransactionHandlerMockRecorder) HandleTransaction(ctx, fn interface{}) *gomock.Call {
+func (mr *MockTransactionHandlerMockRecorder) HandleTransaction(ctx, fn interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleTransaction", reflect.TypeOf((*MockRelationalTransactionHandler)(nil).HandleTransaction), ctx, fn)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleTransaction", reflect.TypeOf((*MockTransactionHandler)(nil).HandleTransaction), ctx, fn)
 }

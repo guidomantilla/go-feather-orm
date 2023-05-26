@@ -6,8 +6,8 @@ import (
 
 func TestCreateSelectSQL(t *testing.T) {
 	type model struct {
-		Id   string `sql:"id,pk,generated"`
-		Name string `sql:"name"`
+		Id   string `db_column:"id,pk,generated"`
+		Name string `db_column:"name"`
 	}
 	type args struct {
 		table       string
@@ -81,11 +81,11 @@ func TestCreateSelectSQL(t *testing.T) {
 
 func TestCreateInsertSQL(t *testing.T) {
 	type model struct {
-		Id string `sql:"id,pk"`
+		Id string `db_column:"id,pk"`
 	}
 	type model2 struct {
-		Id   string `sql:"id,pk,generated"`
-		Name string `sql:"name"`
+		Id   string `db_column:"id,pk,generated"`
+		Name string `db_column:"name"`
 	}
 	type args struct {
 		table       string
@@ -166,7 +166,7 @@ func TestCreateInsertSQL(t *testing.T) {
 
 func TestCreateUpdateSQL(t *testing.T) {
 	type model struct {
-		Id string `sql:"id"`
+		Id string `db_column:"id"`
 	}
 	type args struct {
 		table       string
@@ -230,7 +230,7 @@ func TestCreateUpdateSQL(t *testing.T) {
 
 func TestCreateDeleteSQL(t *testing.T) {
 	type model struct {
-		Id string `sql:"id"`
+		Id string `db_column:"id"`
 	}
 	type args struct {
 		table       string

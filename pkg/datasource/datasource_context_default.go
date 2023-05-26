@@ -8,14 +8,14 @@ import (
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
-type DefaultRelationalDatasourceContext struct {
+type DefaultDatasourceContext struct {
 	driverName  feather_sql.DriverName
 	paramHolder feather_sql.ParamHolder
 	url         string
 }
 
-func NewDefaultRelationalDatasourceContext(driverName feather_sql.DriverName, paramHolder feather_sql.ParamHolder,
-	url string, username string, password string, server string, service string) *DefaultRelationalDatasourceContext {
+func NewDefaultDatasourceContext(driverName feather_sql.DriverName, paramHolder feather_sql.ParamHolder,
+	url string, username string, password string, server string, service string) *DefaultDatasourceContext {
 
 	driverName = feather_sql.UndefinedDriverName.ValueFromCardinal(int(driverName))
 	if driverName == feather_sql.UndefinedDriverName {
@@ -52,21 +52,21 @@ func NewDefaultRelationalDatasourceContext(driverName feather_sql.DriverName, pa
 	url = strings.Replace(url, ":server", server, 1)
 	url = strings.Replace(url, ":service", service, 1)
 
-	return &DefaultRelationalDatasourceContext{
+	return &DefaultDatasourceContext{
 		driverName:  driverName,
 		paramHolder: paramHolder,
 		url:         url,
 	}
 }
 
-func (context *DefaultRelationalDatasourceContext) GetDriverName() feather_sql.DriverName {
+func (context *DefaultDatasourceContext) GetDriverName() feather_sql.DriverName {
 	return context.driverName
 }
 
-func (context *DefaultRelationalDatasourceContext) GetParamHolder() feather_sql.ParamHolder {
+func (context *DefaultDatasourceContext) GetParamHolder() feather_sql.ParamHolder {
 	return context.paramHolder
 }
 
-func (context *DefaultRelationalDatasourceContext) GetUrl() string {
+func (context *DefaultDatasourceContext) GetUrl() string {
 	return context.url
 }

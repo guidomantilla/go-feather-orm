@@ -13,7 +13,7 @@ import (
 )
 
 type DefaultCrudDao struct {
-	//datasourceContext datasource.RelationalDatasourceContext
+	//datasourceContext datasource.DatasourceContext
 	driverName        feather_sql.DriverName
 	paramHolder       feather_sql.ParamHolder
 	table             string
@@ -24,7 +24,7 @@ type DefaultCrudDao struct {
 	statementFindAll  string
 }
 
-func NewDefaultCrudDao(datasourceContext feather_sql_datasource.RelationalDatasourceContext, table string, model any) *DefaultCrudDao {
+func NewDefaultCrudDao(datasourceContext feather_sql_datasource.DatasourceContext, table string, model any) *DefaultCrudDao {
 
 	if datasourceContext == nil {
 		zap.L().Fatal(fmt.Sprintf("starting up - error setting up %s dao: datasourceContext is nil", table))

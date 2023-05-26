@@ -7,11 +7,11 @@ import (
 )
 
 var (
-	_ RelationalDatasourceContext = (*DefaultRelationalDatasourceContext)(nil)
-	_ RelationalDatasource        = (*DefaultRelationalDatasource)(nil)
+	_ DatasourceContext = (*DefaultDatasourceContext)(nil)
+	_ Datasource        = (*DefaultDatasource)(nil)
 )
 
-type RelationalDatasourceContext interface {
+type DatasourceContext interface {
 	GetDriverName() feather_sql.DriverName
 	GetParamHolder() feather_sql.ParamHolder
 	GetUrl() string
@@ -21,6 +21,6 @@ type RelationalDatasourceContext interface {
 
 type OpenDatasourceFunc func(driverName, datasourceUrl string) (*sql.DB, error)
 
-type RelationalDatasource interface {
+type Datasource interface {
 	GetDatabase() (*sql.DB, error)
 }

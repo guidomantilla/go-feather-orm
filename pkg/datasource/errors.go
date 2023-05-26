@@ -2,6 +2,7 @@ package datasource
 
 import (
 	"errors"
+
 	"go.uber.org/multierr"
 )
 

@@ -12,23 +12,23 @@ func TestRetrieveColumnNames(t *testing.T) {
 		Name string
 	}
 	type modelOK02 struct {
-		Id   string `sql:"-"`
-		Name string `sql:"-"`
+		Id   string `db_column:"-"`
+		Name string `db_column:"-"`
 	}
 
 	type modelOK03 struct {
-		Id   string `sql:""`
-		Name string `sql:""`
+		Id   string `db_column:""`
+		Name string `db_column:""`
 	}
 
 	type modelOK04 struct {
-		Id   string `sql:","`
-		Name string `sql:","`
+		Id   string `db_column:","`
+		Name string `db_column:","`
 	}
 
 	type modelOK05 struct {
-		Id   string `sql:"id"`
-		Name string `sql:"name"`
+		Id   string `db_column:"id"`
+		Name string `db_column:"name"`
 	}
 
 	type args struct {
@@ -462,7 +462,7 @@ func Test_retrieveFields(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := retrieveFields(tt.args.reflectedValue); !reflect.DeepEqual(got, tt.want) {
+			if got := RetrieveFields(tt.args.reflectedValue); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("retrieveFields() = %v, want %v", got, tt.want)
 			}
 		})
@@ -513,7 +513,7 @@ func Test_retrieveReflectedStruct(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := retrieveReflectedStruct(tt.args.value)
+			got, err := RetrieveReflectedStruct(tt.args.value)
 			if tt.wantErr {
 				if err != nil {
 					if !reflect.DeepEqual(err, tt.errWanted) {

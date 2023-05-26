@@ -6,7 +6,9 @@ import (
 )
 
 const (
-	TagKey            = "sql"
+	TagTableKey       = "db_table"
+	TagViewKey        = "db_view"
+	TagColumnKey      = "db_column"
 	TagPkValue        = "pk"
 	TagUqValue        = "uq"
 	TagGeneratedValue = "generated"
@@ -16,7 +18,7 @@ func RetrieveColumnNames(value any, columnFilterFunc ColumnFilterFunc) ([]string
 
 	var err error
 	var reflectedValue *reflect.Value
-	if reflectedValue, err = retrieveReflectedStruct(value); err != nil {
+	if reflectedValue, err = RetrieveReflectedStruct(value); err != nil {
 		return nil, err
 	}
 
@@ -24,11 +26,11 @@ func RetrieveColumnNames(value any, columnFilterFunc ColumnFilterFunc) ([]string
 		return nil, ErrColumnFilterFuncIsNil
 	}
 
-	fields := retrieveFields(*reflectedValue)
+	fields := RetrieveFields(*reflectedValue)
 
 	columnNames := make([]string, 0)
 	for _, field := range fields {
-		reflectedTagKey := field.Tag.Get(TagKey)
+		reflectedTagKey := field.Tag.Get(TagColumnKey)
 		if reflectedTagKey == "-" || reflectedTagKey == "" {
 			continue
 		}
@@ -91,7 +93,7 @@ func NoneColumnFilter(_ []string) bool {
 	return false
 }
 
-func retrieveFields(reflectedValue reflect.Value) []reflect.StructField {
+func RetrieveFields(reflectedValue reflect.Value) []reflect.StructField {
 
 	fields := make([]reflect.StructField, 0)
 	reflectedType := reflectedValue.Type()
@@ -109,7 +111,7 @@ func retrieveFields(reflectedValue reflect.Value) []reflect.StructField {
 	return fields
 }
 
-func retrieveReflectedStruct(value any) (*reflect.Value, error) {
+func RetrieveReflectedStruct(value any) (*reflect.Value, error) {
 
 	if value == nil {
 		return nil, ErrAnyIsNil

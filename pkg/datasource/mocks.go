@@ -12,31 +12,31 @@ import (
 	sql0 "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
-// MockRelationalDatasourceContext is a mock of RelationalDatasourceContext interface.
-type MockRelationalDatasourceContext struct {
+// MockDatasourceContext is a mock of DatasourceContext interface.
+type MockDatasourceContext struct {
 	ctrl     *gomock.Controller
-	recorder *MockRelationalDatasourceContextMockRecorder
+	recorder *MockDatasourceContextMockRecorder
 }
 
-// MockRelationalDatasourceContextMockRecorder is the mock recorder for MockRelationalDatasourceContext.
-type MockRelationalDatasourceContextMockRecorder struct {
-	mock *MockRelationalDatasourceContext
+// MockDatasourceContextMockRecorder is the mock recorder for MockDatasourceContext.
+type MockDatasourceContextMockRecorder struct {
+	mock *MockDatasourceContext
 }
 
-// NewMockRelationalDatasourceContext creates a new mock instance.
-func NewMockRelationalDatasourceContext(ctrl *gomock.Controller) *MockRelationalDatasourceContext {
-	mock := &MockRelationalDatasourceContext{ctrl: ctrl}
-	mock.recorder = &MockRelationalDatasourceContextMockRecorder{mock}
+// NewMockDatasourceContext creates a new mock instance.
+func NewMockDatasourceContext(ctrl *gomock.Controller) *MockDatasourceContext {
+	mock := &MockDatasourceContext{ctrl: ctrl}
+	mock.recorder = &MockDatasourceContextMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockRelationalDatasourceContext) EXPECT() *MockRelationalDatasourceContextMockRecorder {
+func (m *MockDatasourceContext) EXPECT() *MockDatasourceContextMockRecorder {
 	return m.recorder
 }
 
 // GetDriverName mocks base method.
-func (m *MockRelationalDatasourceContext) GetDriverName() sql0.DriverName {
+func (m *MockDatasourceContext) GetDriverName() sql0.DriverName {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDriverName")
 	ret0, _ := ret[0].(sql0.DriverName)
@@ -44,13 +44,13 @@ func (m *MockRelationalDatasourceContext) GetDriverName() sql0.DriverName {
 }
 
 // GetDriverName indicates an expected call of GetDriverName.
-func (mr *MockRelationalDatasourceContextMockRecorder) GetDriverName() *gomock.Call {
+func (mr *MockDatasourceContextMockRecorder) GetDriverName() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDriverName", reflect.TypeOf((*MockRelationalDatasourceContext)(nil).GetDriverName))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDriverName", reflect.TypeOf((*MockDatasourceContext)(nil).GetDriverName))
 }
 
 // GetParamHolder mocks base method.
-func (m *MockRelationalDatasourceContext) GetParamHolder() sql0.ParamHolder {
+func (m *MockDatasourceContext) GetParamHolder() sql0.ParamHolder {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetParamHolder")
 	ret0, _ := ret[0].(sql0.ParamHolder)
@@ -58,13 +58,13 @@ func (m *MockRelationalDatasourceContext) GetParamHolder() sql0.ParamHolder {
 }
 
 // GetParamHolder indicates an expected call of GetParamHolder.
-func (mr *MockRelationalDatasourceContextMockRecorder) GetParamHolder() *gomock.Call {
+func (mr *MockDatasourceContextMockRecorder) GetParamHolder() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParamHolder", reflect.TypeOf((*MockRelationalDatasourceContext)(nil).GetParamHolder))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParamHolder", reflect.TypeOf((*MockDatasourceContext)(nil).GetParamHolder))
 }
 
 // GetUrl mocks base method.
-func (m *MockRelationalDatasourceContext) GetUrl() string {
+func (m *MockDatasourceContext) GetUrl() string {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetUrl")
 	ret0, _ := ret[0].(string)
@@ -72,36 +72,36 @@ func (m *MockRelationalDatasourceContext) GetUrl() string {
 }
 
 // GetUrl indicates an expected call of GetUrl.
-func (mr *MockRelationalDatasourceContextMockRecorder) GetUrl() *gomock.Call {
+func (mr *MockDatasourceContextMockRecorder) GetUrl() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUrl", reflect.TypeOf((*MockRelationalDatasourceContext)(nil).GetUrl))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetUrl", reflect.TypeOf((*MockDatasourceContext)(nil).GetUrl))
 }
 
-// MockRelationalDatasource is a mock of RelationalDatasource interface.
-type MockRelationalDatasource struct {
+// MockDatasource is a mock of Datasource interface.
+type MockDatasource struct {
 	ctrl     *gomock.Controller
-	recorder *MockRelationalDatasourceMockRecorder
+	recorder *MockDatasourceMockRecorder
 }
 
-// MockRelationalDatasourceMockRecorder is the mock recorder for MockRelationalDatasource.
-type MockRelationalDatasourceMockRecorder struct {
-	mock *MockRelationalDatasource
+// MockDatasourceMockRecorder is the mock recorder for MockDatasource.
+type MockDatasourceMockRecorder struct {
+	mock *MockDatasource
 }
 
-// NewMockRelationalDatasource creates a new mock instance.
-func NewMockRelationalDatasource(ctrl *gomock.Controller) *MockRelationalDatasource {
-	mock := &MockRelationalDatasource{ctrl: ctrl}
-	mock.recorder = &MockRelationalDatasourceMockRecorder{mock}
+// NewMockDatasource creates a new mock instance.
+func NewMockDatasource(ctrl *gomock.Controller) *MockDatasource {
+	mock := &MockDatasource{ctrl: ctrl}
+	mock.recorder = &MockDatasourceMockRecorder{mock}
 	return mock
 }
 
 // EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockRelationalDatasource) EXPECT() *MockRelationalDatasourceMockRecorder {
+func (m *MockDatasource) EXPECT() *MockDatasourceMockRecorder {
 	return m.recorder
 }
 
 // GetDatabase mocks base method.
-func (m *MockRelationalDatasource) GetDatabase() (*sql.DB, error) {
+func (m *MockDatasource) GetDatabase() (*sql.DB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDatabase")
 	ret0, _ := ret[0].(*sql.DB)
@@ -110,7 +110,7 @@ func (m *MockRelationalDatasource) GetDatabase() (*sql.DB, error) {
 }
 
 // GetDatabase indicates an expected call of GetDatabase.
-func (mr *MockRelationalDatasourceMockRecorder) GetDatabase() *gomock.Call {
+func (mr *MockDatasourceMockRecorder) GetDatabase() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDatabase", reflect.TypeOf((*MockRelationalDatasource)(nil).GetDatabase))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDatabase", reflect.TypeOf((*MockDatasource)(nil).GetDatabase))
 }

@@ -2,6 +2,7 @@ package sql
 
 import (
 	"errors"
+
 	"go.uber.org/multierr"
 )
 

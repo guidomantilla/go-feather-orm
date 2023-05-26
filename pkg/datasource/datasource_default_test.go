@@ -11,16 +11,16 @@ import (
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
-func TestNewDefaultRelationalDatasource(t *testing.T) {
+func TestNewDefaultDatasource(t *testing.T) {
 	openFunc := OpenDatasourceFunc(func(driverName, dataSourceUrl string) (*sql.DB, error) {
 		return nil, nil
 	})
-	datasourceCtx := &DefaultRelationalDatasourceContext{
+	datasourceCtx := &DefaultDatasourceContext{
 		driverName:  feather_sql.UndefinedDriverName,
 		paramHolder: feather_sql.NamedParamHolder,
 		url:         "some_usersome_passsome_serversome_service",
 	}
-	datasource := &DefaultRelationalDatasource{
+	datasource := &DefaultDatasource{
 		driver:   datasourceCtx.driverName.String(),
 		url:      datasourceCtx.url,
 		database: nil,
@@ -28,13 +28,13 @@ func TestNewDefaultRelationalDatasource(t *testing.T) {
 	}
 
 	type args struct {
-		datasourceContext RelationalDatasourceContext
+		datasourceContext DatasourceContext
 		openFunc          OpenDatasourceFunc
 	}
 	tests := []struct {
 		name string
 		args args
-		want *DefaultRelationalDatasource
+		want *DefaultDatasource
 	}{
 		{
 			name: "Happy Path",
@@ -47,33 +47,33 @@ func TestNewDefaultRelationalDatasource(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewDefaultRelationalDatasource(tt.args.datasourceContext, tt.args.openFunc)
+			got := NewDefaultDatasource(tt.args.datasourceContext, tt.args.openFunc)
 			if !reflect.DeepEqual(reflect.ValueOf(got.openFunc), reflect.ValueOf(tt.want.openFunc)) {
-				t.Errorf("NewDefaultRelationalDatasource() = %v, want %v", got.openFunc, tt.want.openFunc)
+				t.Errorf("NewDefaultDatasource() = %v, want %v", got.openFunc, tt.want.openFunc)
 			}
 			if !reflect.DeepEqual(got.url, tt.want.url) {
-				t.Errorf("NewDefaultRelationalDatasource() = %v, want %v", got.url, tt.want.url)
+				t.Errorf("NewDefaultDatasource() = %v, want %v", got.url, tt.want.url)
 			}
 			if !reflect.DeepEqual(got.driver, tt.want.driver) {
-				t.Errorf("NewDefaultRelationalDatasource() = %v, want %v", got.driver, tt.want.driver)
+				t.Errorf("NewDefaultDatasource() = %v, want %v", got.driver, tt.want.driver)
 			}
 			if !reflect.DeepEqual(got.database, tt.want.database) {
-				t.Errorf("NewDefaultRelationalDatasource() = %v, want %v", got.database, tt.want.database)
+				t.Errorf("NewDefaultDatasource() = %v, want %v", got.database, tt.want.database)
 			}
 		})
 	}
 }
 
-func TestDefaultRelationalDatasource_GetDatabase(t *testing.T) {
+func TestDefaultDatasource_GetDatabase(t *testing.T) {
 
-	datasourceCtx := &DefaultRelationalDatasourceContext{
+	datasourceCtx := &DefaultDatasourceContext{
 		driverName:  feather_sql.UndefinedDriverName,
 		paramHolder: feather_sql.NamedParamHolder,
 		url:         "some_usersome_passsome_serversome_service",
 	}
 
-	errOpenFuncPath := func() *DefaultRelationalDatasource {
-		return &DefaultRelationalDatasource{
+	errOpenFuncPath := func() *DefaultDatasource {
+		return &DefaultDatasource{
 			driver:   datasourceCtx.driverName.String(),
 			url:      datasourceCtx.url,
 			database: nil,
@@ -83,7 +83,7 @@ func TestDefaultRelationalDatasource_GetDatabase(t *testing.T) {
 		}
 	}
 
-	errOpenFuncPath2 := func() *DefaultRelationalDatasource {
+	errOpenFuncPath2 := func() *DefaultDatasource {
 
 		var err error
 		var db *sql.DB
@@ -92,7 +92,7 @@ func TestDefaultRelationalDatasource_GetDatabase(t *testing.T) {
 			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 		}
 		mock.ExpectPing().WillReturnError(errors.New("some error"))
-		return &DefaultRelationalDatasource{
+		return &DefaultDatasource{
 			driver:   datasourceCtx.driverName.String(),
 			url:      datasourceCtx.url,
 			database: db,
@@ -109,8 +109,8 @@ func TestDefaultRelationalDatasource_GetDatabase(t *testing.T) {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
 	mock.ExpectPing()
-	happyPath := func() *DefaultRelationalDatasource {
-		return &DefaultRelationalDatasource{
+	happyPath := func() *DefaultDatasource {
+		return &DefaultDatasource{
 			driver: datasourceCtx.driverName.String(),
 			url:    datasourceCtx.url,
 			openFunc: func(driverName, dataSourceUrl string) (*sql.DB, error) {
@@ -121,7 +121,7 @@ func TestDefaultRelationalDatasource_GetDatabase(t *testing.T) {
 
 	tests := []struct {
 		name       string
-		datasource *DefaultRelationalDatasource
+		datasource *DefaultDatasource
 		want       *sql.DB
 		wantErr    bool
 	}{
@@ -148,11 +148,11 @@ func TestDefaultRelationalDatasource_GetDatabase(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := tt.datasource.GetDatabase()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("DefaultRelationalDatasource.GetDatabase() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("DefaultDatasource.GetDatabase() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("DefaultRelationalDatasource.GetDatabase() = %v, want %v", got, tt.want)
+				t.Errorf("DefaultDatasource.GetDatabase() = %v, want %v", got, tt.want)
 			}
 		})
 	}

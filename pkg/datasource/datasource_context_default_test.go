@@ -7,9 +7,9 @@ import (
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
-func TestNewDefaultRelationalDatasourceContext(t *testing.T) {
+func TestNewDefaultDatasourceContext(t *testing.T) {
 
-	datasourceCtx := &DefaultRelationalDatasourceContext{
+	datasourceCtx := &DefaultDatasourceContext{
 		driverName:  feather_sql.OracleDriverName,
 		paramHolder: feather_sql.NamedParamHolder,
 		url:         "some_usersome_passsome_serversome_service",
@@ -26,7 +26,7 @@ func TestNewDefaultRelationalDatasourceContext(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *DefaultRelationalDatasourceContext
+		want *DefaultDatasourceContext
 	}{
 		{
 			name: "Happy Path",
@@ -44,21 +44,21 @@ func TestNewDefaultRelationalDatasourceContext(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := NewDefaultRelationalDatasourceContext(tt.args.driverName, tt.args.paramHolder, tt.args.url, tt.args.username, tt.args.password, tt.args.server, tt.args.service)
+			got := NewDefaultDatasourceContext(tt.args.driverName, tt.args.paramHolder, tt.args.url, tt.args.username, tt.args.password, tt.args.server, tt.args.service)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("NewDefaultRelationalDatasourceContext() = %v, want %v", got, tt.want)
+				t.Errorf("NewDefaultDatasourceContext() = %v, want %v", got, tt.want)
 			}
 
 			if !reflect.DeepEqual(got.GetUrl(), tt.want.GetUrl()) {
-				t.Errorf("NewDefaultRelationalDatasourceContext() = %v, want %v", got.GetUrl(), tt.want.GetUrl())
+				t.Errorf("NewDefaultDatasourceContext() = %v, want %v", got.GetUrl(), tt.want.GetUrl())
 			}
 
 			if !reflect.DeepEqual(got.GetParamHolder(), tt.want.GetParamHolder()) {
-				t.Errorf("NewDefaultRelationalDatasourceContext() = %v, want %v", got.GetParamHolder(), tt.want.GetParamHolder())
+				t.Errorf("NewDefaultDatasourceContext() = %v, want %v", got.GetParamHolder(), tt.want.GetParamHolder())
 			}
 
 			if !reflect.DeepEqual(got.GetDriverName(), tt.want.GetDriverName()) {
-				t.Errorf("NewDefaultRelationalDatasourceContext() = %v, want %v", got.GetDriverName(), tt.want.GetDriverName())
+				t.Errorf("NewDefaultDatasourceContext() = %v, want %v", got.GetDriverName(), tt.want.GetDriverName())
 			}
 		})
 	}

@@ -80,7 +80,7 @@ func ReadRowContext(ctx context.Context, sqlStatement string, key any, dest ...a
 
 		row := statement.QueryRow(key)
 		if err = row.Scan(dest...); err != nil {
-			if err.Error() == "sql: no rows in result set" {
+			if err.Error() == "db_column: no rows in result set" {
 				return fmt.Errorf("row with key %v not found", key)
 			}
 			return err
@@ -100,7 +100,7 @@ func Context(ctx context.Context, sqlStatement string, fn Function) error {
 
 	var err error
 	var statement *sql.Stmt
-	var tx = ctx.Value(feather_sql_transaction.RelationalTransactionCtxKey{}).(*sql.Tx)
+	var tx = ctx.Value(feather_sql_transaction.TransactionCtxKey{}).(*sql.Tx)
 	if statement, err = tx.Prepare(sqlStatement); err != nil {
 		return ErrContextFailed(err)
 	}

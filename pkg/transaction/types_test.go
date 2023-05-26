@@ -18,47 +18,47 @@ func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 	defer ctrl.Finish()
 
 	errGetDatabasePath := func() *DefaultDBTransactionHandler {
-		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(nil, errors.New("some_error"))
-		return NewRelationalTransactionHandler(datasource)
+		return NewTransactionHandler(datasource)
 	}
 
 	errBeginPath := func() *DefaultDBTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin().WillReturnError(errors.New("some_error"))
-		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
-		return NewRelationalTransactionHandler(datasource)
+		return NewTransactionHandler(datasource)
 	}
 
 	errDeferPath := func() *DefaultDBTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
-		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
-		return NewRelationalTransactionHandler(datasource)
+		return NewTransactionHandler(datasource)
 	}
 
 	panicDeferPath := func() *DefaultDBTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
 		sqlMock.ExpectRollback()
-		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
-		return NewRelationalTransactionHandler(datasource)
+		return NewTransactionHandler(datasource)
 	}
 
 	happyPath := func() *DefaultDBTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
-		datasource := feather_sql_datasource.NewMockRelationalDatasource(ctrl)
+		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
-		return NewRelationalTransactionHandler(datasource)
+		return NewTransactionHandler(datasource)
 	}
 
 	type args struct {
 		ctx context.Context
-		fn  RelationalTransactionHandlerFunction
+		fn  TransactionHandlerFunction
 	}
 	tests := []struct {
 		name    string
