@@ -24,7 +24,11 @@ type ReadFunction func(rows *sql.Rows) error
 
 func WriteContext(ctx context.Context, sqlStatement string, args ...any) (*int64, error) {
 
-	driverName := ctx.Value(feather_sql.DriverNameContext{}).(feather_sql.DriverName)
+	var ok bool
+	var driverName feather_sql.DriverName
+	if driverName, ok = ctx.Value(feather_sql.DriverNameContext{}).(feather_sql.DriverName); !ok {
+		return nil, ErrWriteContextFailed(errors.New(sqlStatement), errors.New("driver name not found in context"))
+	}
 
 	var err error
 	var serial int64
@@ -101,7 +105,7 @@ func Context(ctx context.Context, sqlStatement string, fn Function) error {
 	var ok bool
 	var tx *sql.Tx
 	if tx, ok = ctx.Value(feather_sql_transaction.TransactionCtxKey{}).(*sql.Tx); !ok {
-		return ErrContextFailed(errors.New(sqlStatement), errors.New("transaction context not found"))
+		return ErrContextFailed(errors.New(sqlStatement), errors.New("transaction not found in context"))
 	}
 
 	var err error
