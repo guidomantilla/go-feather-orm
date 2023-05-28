@@ -409,7 +409,7 @@ func Test_closeStatement(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			closeStatement(tt.args.statement)
+			CloseStatement(tt.args.statement)
 		})
 	}
 }
@@ -451,7 +451,7 @@ func Test_closeResultSet(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			closeResultSet(tt.args.rows)
+			CloseResultSet(tt.args.rows)
 		})
 	}
 }

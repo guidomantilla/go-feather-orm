@@ -59,7 +59,7 @@ func ReadContext(ctx context.Context, sqlStatement string, fn ReadFunction) erro
 		if rows, err = statement.Query(); err != nil {
 			return err
 		}
-		defer closeResultSet(rows)
+		defer CloseResultSet(rows)
 
 		if err = fn(rows); err != nil {
 			return err
@@ -98,13 +98,18 @@ func ReadRowContext(ctx context.Context, sqlStatement string, key any, dest ...a
 
 func Context(ctx context.Context, sqlStatement string, fn Function) error {
 
+	var ok bool
+	var tx *sql.Tx
+	if tx, ok = ctx.Value(feather_sql_transaction.TransactionCtxKey{}).(*sql.Tx); !ok {
+		return ErrContextFailed(errors.New(sqlStatement), errors.New("transaction context not found"))
+	}
+
 	var err error
 	var statement *sql.Stmt
-	var tx = ctx.Value(feather_sql_transaction.TransactionCtxKey{}).(*sql.Tx)
 	if statement, err = tx.Prepare(sqlStatement); err != nil {
-		return ErrContextFailed(err)
+		return ErrContextFailed(errors.New(sqlStatement), err)
 	}
-	defer closeStatement(statement)
+	defer CloseStatement(statement)
 
 	if err = fn(statement); err != nil {
 		return ErrContextFailed(errors.New(sqlStatement), err)
@@ -112,13 +117,13 @@ func Context(ctx context.Context, sqlStatement string, fn Function) error {
 	return nil
 }
 
-func closeStatement(statement *sql.Stmt) {
+func CloseStatement(statement *sql.Stmt) {
 	if err := statement.Close(); err != nil {
 		zap.L().Error(ErrorClosingStatement)
 	}
 }
 
-func closeResultSet(rows *sql.Rows) {
+func CloseResultSet(rows *sql.Rows) {
 	if err := rows.Close(); err != nil {
 		zap.L().Error(ErrorClosingResultSet)
 	}
