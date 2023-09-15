@@ -5,9 +5,8 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"log/slog"
 	"strings"
-
-	"go.uber.org/zap"
 
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 	feather_sql_transaction "github.com/guidomantilla/go-feather-sql/pkg/transaction"
@@ -123,12 +122,12 @@ func Context(ctx context.Context, sqlStatement string, fn Function) error {
 
 func CloseStatement(statement *sql.Stmt) {
 	if err := statement.Close(); err != nil {
-		zap.L().Error(ErrorClosingStatement)
+		slog.Error(ErrorClosingStatement)
 	}
 }
 
 func CloseResultSet(rows *sql.Rows) {
 	if err := rows.Close(); err != nil {
-		zap.L().Error(ErrorClosingResultSet)
+		slog.Error(ErrorClosingResultSet)
 	}
 }

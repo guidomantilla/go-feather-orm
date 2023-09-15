@@ -7,7 +7,6 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/sijms/go-ora/v2 v2.7.17
 	go.uber.org/multierr v1.11.0
-	go.uber.org/zap v1.26.0
 )
 
 require (

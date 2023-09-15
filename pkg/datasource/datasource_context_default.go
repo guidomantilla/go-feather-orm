@@ -1,9 +1,9 @@
 package datasource
 
 import (
+	"log/slog"
+	"os"
 	"strings"
-
-	"go.uber.org/zap"
 
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
@@ -19,32 +19,39 @@ func NewDefaultDatasourceContext(driverName feather_sql.DriverName, paramHolder 
 
 	driverName = feather_sql.UndefinedDriverName.ValueFromCardinal(int(driverName))
 	if driverName == feather_sql.UndefinedDriverName {
-		zap.L().Fatal("starting up - error setting up datasourceContext: driverName undefined")
+		slog.Error("starting up - error setting up datasourceContext: driverName undefined")
+		os.Exit(1)
 	}
 
 	paramHolder = feather_sql.UndefinedParamHolder.ValueFromCardinal(int(paramHolder))
 	if paramHolder == feather_sql.UndefinedParamHolder {
-		zap.L().Fatal("starting up - error setting up datasourceContext: paramHolder undefined")
+		slog.Error("starting up - error setting up datasourceContext: paramHolder undefined")
+		os.Exit(1)
 	}
 
 	if strings.TrimSpace(url) == "" {
-		zap.L().Fatal("starting up - error setting up datasourceContext: url is empty")
+		slog.Error("starting up - error setting up datasourceContext: url is empty")
+		os.Exit(1)
 	}
 
 	if strings.TrimSpace(username) == "" {
-		zap.L().Fatal("starting up - error setting up datasourceContext: username is empty")
+		slog.Error("starting up - error setting up datasourceContext: username is empty")
+		os.Exit(1)
 	}
 
 	if strings.TrimSpace(password) == "" {
-		zap.L().Fatal("starting up - error setting up datasourceContext: password is empty")
+		slog.Error("starting up - error setting up datasourceContext: password is empty")
+		os.Exit(1)
 	}
 
 	if strings.TrimSpace(server) == "" {
-		zap.L().Fatal("starting up - error setting up datasourceContext: server is empty")
+		slog.Error("starting up - error setting up datasourceContext: server is empty")
+		os.Exit(1)
 	}
 
 	if strings.TrimSpace(service) == "" {
-		zap.L().Fatal("starting up - error setting up datasourceContext: service is empty")
+		slog.Error("starting up - error setting up datasourceContext: service is empty")
+		os.Exit(1)
 	}
 
 	url = strings.Replace(url, ":username", username, 1)

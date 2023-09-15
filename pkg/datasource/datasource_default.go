@@ -2,8 +2,8 @@ package datasource
 
 import (
 	"database/sql"
-
-	"go.uber.org/zap"
+	"log/slog"
+	"os"
 )
 
 type DefaultDatasource struct {
@@ -16,11 +16,13 @@ type DefaultDatasource struct {
 func NewDefaultDatasource(datasourceContext DatasourceContext, openFunc OpenDatasourceFunc) *DefaultDatasource {
 
 	if datasourceContext == nil {
-		zap.L().Fatal("starting up - error setting up datasource: datasourceContext is nil")
+		slog.Error("starting up - error setting up datasource: datasourceContext is nil")
+		os.Exit(1)
 	}
 
 	if openFunc == nil {
-		zap.L().Fatal("starting up - error setting up datasource: openFunc is nil")
+		slog.Error("starting up - error setting up datasource: openFunc is nil")
+		os.Exit(1)
 	}
 
 	return &DefaultDatasource{
@@ -37,14 +39,14 @@ func (datasource *DefaultDatasource) GetDatabase() (*sql.DB, error) {
 
 	if datasource.database == nil {
 		if datasource.database, err = datasource.openFunc(datasource.driver, datasource.url); err != nil {
-			zap.L().Error(err.Error())
+			slog.Error(err.Error())
 			return nil, ErrDBConnectionFailed(err)
 		}
 	}
 
 	if err = datasource.database.Ping(); err != nil {
 		if datasource.database, err = datasource.openFunc(datasource.driver, datasource.url); err != nil {
-			zap.L().Error(err.Error())
+			slog.Error(err.Error())
 			return nil, ErrDBConnectionFailed(err)
 		}
 	}

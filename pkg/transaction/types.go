@@ -4,8 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
-
-	"go.uber.org/zap"
+	"log/slog"
 
 	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 )
@@ -29,7 +28,8 @@ type DefaultDBTransactionHandler struct {
 func NewTransactionHandler(datasource feather_sql_datasource.Datasource) *DefaultDBTransactionHandler {
 
 	if datasource == nil {
-		zap.L().Fatal("starting up - error setting up transactionHandler: datasource is nil")
+		slog.Error("starting up - error setting up transactionHandler: datasource is nil")
+		return nil
 	}
 
 	return &DefaultDBTransactionHandler{
@@ -41,19 +41,19 @@ func (handler *DefaultDBTransactionHandler) HandleTransaction(ctx context.Contex
 
 	db, err := handler.Datasource.GetDatabase()
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
 	tx, err := db.Begin()
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 		return err
 	}
 
 	defer func() {
 		if p := recover(); p != nil {
-			zap.L().Error(fmt.Sprintf("recovering from panic: %v", p))
+			slog.Error(fmt.Sprintf("recovering from panic: %v", p))
 			handleError(tx.Rollback())
 		} else if err != nil {
 			handleError(tx.Rollback())
@@ -71,6 +71,6 @@ func (handler *DefaultDBTransactionHandler) HandleTransaction(ctx context.Contex
 
 func handleError(err error) {
 	if err != nil {
-		zap.L().Error(err.Error())
+		slog.Error(err.Error())
 	}
 }
