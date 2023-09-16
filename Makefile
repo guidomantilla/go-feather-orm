@@ -26,6 +26,9 @@ coverage: test
 	go tool cover -func=coverage.out
 	go tool cover -html=coverage.out -o coverage.html
 
+graph:
+	godepgraph -s . | dot -Tpng -o godepgraph.png
+
 sonarqube: coverage
 	sonar-scanner
 

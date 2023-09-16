@@ -2,8 +2,6 @@ package sql
 
 import (
 	"errors"
-
-	"go.uber.org/multierr"
 )
 
 var (
@@ -15,5 +13,5 @@ var (
 )
 
 func ErrSQLGenerationFailed(errs ...error) error {
-	return errors.New("sql generation failed: " + multierr.Combine(errs...).Error())
+	return errors.New("sql generation failed: " + errors.Join(errs...).Error())
 }
