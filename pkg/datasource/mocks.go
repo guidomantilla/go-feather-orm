@@ -5,6 +5,7 @@
 package datasource
 
 import (
+	context "context"
 	sql "database/sql"
 	reflect "reflect"
 
@@ -113,4 +114,41 @@ func (m *MockDatasource) GetDatabase() (*sql.DB, error) {
 func (mr *MockDatasourceMockRecorder) GetDatabase() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDatabase", reflect.TypeOf((*MockDatasource)(nil).GetDatabase))
+}
+
+// MockTransactionHandler is a mock of TransactionHandler interface.
+type MockTransactionHandler struct {
+	ctrl     *gomock.Controller
+	recorder *MockTransactionHandlerMockRecorder
+}
+
+// MockTransactionHandlerMockRecorder is the mock recorder for MockTransactionHandler.
+type MockTransactionHandlerMockRecorder struct {
+	mock *MockTransactionHandler
+}
+
+// NewMockTransactionHandler creates a new mock instance.
+func NewMockTransactionHandler(ctrl *gomock.Controller) *MockTransactionHandler {
+	mock := &MockTransactionHandler{ctrl: ctrl}
+	mock.recorder = &MockTransactionHandlerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTransactionHandler) EXPECT() *MockTransactionHandlerMockRecorder {
+	return m.recorder
+}
+
+// HandleTransaction mocks base method.
+func (m *MockTransactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HandleTransaction", ctx, fn)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// HandleTransaction indicates an expected call of HandleTransaction.
+func (mr *MockTransactionHandlerMockRecorder) HandleTransaction(ctx, fn interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HandleTransaction", reflect.TypeOf((*MockTransactionHandler)(nil).HandleTransaction), ctx, fn)
 }

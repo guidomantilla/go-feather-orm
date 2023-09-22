@@ -1,43 +1,28 @@
-package transaction
+package datasource
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log/slog"
-
-	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 )
 
-var (
-	_ TransactionHandler = (*DefaultDBTransactionHandler)(nil)
-)
-
-type TransactionCtxKey struct{}
-
-type TransactionHandlerFunction func(ctx context.Context, tx *sql.Tx) error
-
-type TransactionHandler interface {
-	HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error
+type DefaultTransactionHandler struct {
+	Datasource Datasource
 }
 
-type DefaultDBTransactionHandler struct {
-	Datasource feather_sql_datasource.Datasource
-}
-
-func NewTransactionHandler(datasource feather_sql_datasource.Datasource) *DefaultDBTransactionHandler {
+func NewTransactionHandler(datasource Datasource) *DefaultTransactionHandler {
 
 	if datasource == nil {
 		slog.Error("starting up - error setting up transactionHandler: datasource is nil")
 		return nil
 	}
 
-	return &DefaultDBTransactionHandler{
+	return &DefaultTransactionHandler{
 		Datasource: datasource,
 	}
 }
 
-func (handler *DefaultDBTransactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error {
+func (handler *DefaultTransactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error {
 
 	db, err := handler.Datasource.GetDatabase()
 	if err != nil {

@@ -1,4 +1,4 @@
-package transaction
+package datasource
 
 import (
 	"context"
@@ -8,50 +8,48 @@ import (
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
-
-	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 )
 
-func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
+func TestDefaultTransactionHandler_HandleTransaction(t *testing.T) {
 
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	errGetDatabasePath := func() *DefaultDBTransactionHandler {
-		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
+	errGetDatabasePath := func() *DefaultTransactionHandler {
+		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(nil, errors.New("some_error"))
 		return NewTransactionHandler(datasource)
 	}
 
-	errBeginPath := func() *DefaultDBTransactionHandler {
+	errBeginPath := func() *DefaultTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin().WillReturnError(errors.New("some_error"))
-		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
+		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
 		return NewTransactionHandler(datasource)
 	}
 
-	errDeferPath := func() *DefaultDBTransactionHandler {
+	errDeferPath := func() *DefaultTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
-		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
+		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
 		return NewTransactionHandler(datasource)
 	}
 
-	panicDeferPath := func() *DefaultDBTransactionHandler {
+	panicDeferPath := func() *DefaultTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
 		sqlMock.ExpectRollback()
-		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
+		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
 		return NewTransactionHandler(datasource)
 	}
 
-	happyPath := func() *DefaultDBTransactionHandler {
+	happyPath := func() *DefaultTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
-		datasource := feather_sql_datasource.NewMockDatasource(ctrl)
+		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
 		return NewTransactionHandler(datasource)
 	}
@@ -62,7 +60,7 @@ func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 	}
 	tests := []struct {
 		name    string
-		handler *DefaultDBTransactionHandler
+		handler *DefaultTransactionHandler
 		args    args
 		wantErr bool
 	}{
@@ -126,7 +124,7 @@ func TestDefaultDBTransactionHandler_HandleTransaction(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := tt.handler.HandleTransaction(tt.args.ctx, tt.args.fn); (err != nil) != tt.wantErr {
-				t.Errorf("DefaultDBTransactionHandler.HandleTransaction() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("DefaultTransactionHandler.HandleTransaction() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

@@ -8,8 +8,8 @@ import (
 	"log/slog"
 	"strings"
 
+	feather_sql_transaction "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
-	feather_sql_transaction "github.com/guidomantilla/go-feather-sql/pkg/transaction"
 )
 
 const (

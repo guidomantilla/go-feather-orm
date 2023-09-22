@@ -9,7 +9,7 @@ import (
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 
-	feather_sql_transaction "github.com/guidomantilla/go-feather-sql/pkg/transaction"
+	feather_sql_transaction "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 )
 
 func TestWriteContext(t *testing.T) {
