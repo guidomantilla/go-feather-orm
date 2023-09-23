@@ -17,7 +17,7 @@ func (enum DriverName) String() string {
 
 	switch enum {
 	case UndefinedDriverName:
-		return "unknown"
+		return "undefined"
 	case OracleDriverName:
 		return "oracle"
 	case MysqlDriverName:
@@ -25,7 +25,7 @@ func (enum DriverName) String() string {
 	case PostgresDriverName:
 		return "pgx"
 	}
-	return "unknown"
+	return "undefined"
 }
 
 func (enum DriverName) ValueFromName(driverName string) DriverName {
@@ -101,7 +101,7 @@ func (enum ParamHolder) String() string {
 	case QuestionedParamHolder:
 		return "questioned"
 	}
-	return "unknown"
+	return "undefined"
 }
 
 func (enum ParamHolder) ValueFromName(paramHolderName string) ParamHolder {
