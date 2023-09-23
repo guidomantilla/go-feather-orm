@@ -1,9 +1,9 @@
 package datasource
 
 import (
-	"log/slog"
-	"os"
 	"strings"
+
+	feather_commons_log "github.com/guidomantilla/go-feather-commons/pkg/log"
 
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
@@ -19,39 +19,32 @@ func NewDefaultDatasourceContext(driverName feather_sql.DriverName, paramHolder 
 
 	driverName = feather_sql.UndefinedDriverName.ValueFromCardinal(int(driverName))
 	if driverName == feather_sql.UndefinedDriverName {
-		slog.Error("starting up - error setting up datasourceContext: driverName undefined")
-		os.Exit(1)
+		feather_commons_log.Fatal("starting up - error setting up datasourceContext: driverName undefined")
 	}
 
 	paramHolder = feather_sql.UndefinedParamHolder.ValueFromCardinal(int(paramHolder))
 	if paramHolder == feather_sql.UndefinedParamHolder {
-		slog.Error("starting up - error setting up datasourceContext: paramHolder undefined")
-		os.Exit(1)
+		feather_commons_log.Fatal("starting up - error setting up datasourceContext: paramHolder undefined")
 	}
 
 	if strings.TrimSpace(url) == "" {
-		slog.Error("starting up - error setting up datasourceContext: url is empty")
-		os.Exit(1)
+		feather_commons_log.Fatal("starting up - error setting up datasourceContext: url is empty")
 	}
 
 	if strings.TrimSpace(username) == "" {
-		slog.Error("starting up - error setting up datasourceContext: username is empty")
-		os.Exit(1)
+		feather_commons_log.Fatal("starting up - error setting up datasourceContext: username is empty")
 	}
 
 	if strings.TrimSpace(password) == "" {
-		slog.Error("starting up - error setting up datasourceContext: password is empty")
-		os.Exit(1)
+		feather_commons_log.Fatal("starting up - error setting up datasourceContext: password is empty")
 	}
 
 	if strings.TrimSpace(server) == "" {
-		slog.Error("starting up - error setting up datasourceContext: server is empty")
-		os.Exit(1)
+		feather_commons_log.Fatal("starting up - error setting up datasourceContext: server is empty")
 	}
 
 	if strings.TrimSpace(service) == "" {
-		slog.Error("starting up - error setting up datasourceContext: service is empty")
-		os.Exit(1)
+		feather_commons_log.Fatal("starting up - error setting up datasourceContext: service is empty")
 	}
 
 	url = strings.Replace(url, ":username", username, 1)

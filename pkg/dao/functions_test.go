@@ -380,6 +380,7 @@ func TestContext(t *testing.T) {
 }
 
 func Test_closeStatement(t *testing.T) {
+
 	var err error
 	var db *sql.DB
 	var mock sqlmock.Sqlmock

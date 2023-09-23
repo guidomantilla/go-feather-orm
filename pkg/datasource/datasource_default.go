@@ -2,8 +2,8 @@ package datasource
 
 import (
 	"database/sql"
-	"log/slog"
-	"os"
+
+	feather_commons_log "github.com/guidomantilla/go-feather-commons/pkg/log"
 )
 
 type DefaultDatasource struct {
@@ -16,13 +16,11 @@ type DefaultDatasource struct {
 func NewDefaultDatasource(datasourceContext DatasourceContext, openFunc OpenDatasourceFunc) *DefaultDatasource {
 
 	if datasourceContext == nil {
-		slog.Error("starting up - error setting up datasource: datasourceContext is nil")
-		os.Exit(1)
+		feather_commons_log.Fatal("starting up - error setting up datasource: datasourceContext is nil")
 	}
 
 	if openFunc == nil {
-		slog.Error("starting up - error setting up datasource: openFunc is nil")
-		os.Exit(1)
+		feather_commons_log.Fatal("starting up - error setting up datasource: openFunc is nil")
 	}
 
 	return &DefaultDatasource{
@@ -39,14 +37,14 @@ func (datasource *DefaultDatasource) GetDatabase() (*sql.DB, error) {
 
 	if datasource.database == nil {
 		if datasource.database, err = datasource.openFunc(datasource.driver, datasource.url); err != nil {
-			slog.Error(err.Error())
+			feather_commons_log.Error(err.Error())
 			return nil, ErrDBConnectionFailed(err)
 		}
 	}
 
 	if err = datasource.database.Ping(); err != nil {
 		if datasource.database, err = datasource.openFunc(datasource.driver, datasource.url); err != nil {
-			slog.Error(err.Error())
+			feather_commons_log.Error(err.Error())
 			return nil, ErrDBConnectionFailed(err)
 		}
 	}

@@ -3,7 +3,8 @@ package datasource
 import (
 	"context"
 	"fmt"
-	"log/slog"
+
+	feather_commons_log "github.com/guidomantilla/go-feather-commons/pkg/log"
 )
 
 type DefaultTransactionHandler struct {
@@ -13,7 +14,7 @@ type DefaultTransactionHandler struct {
 func NewTransactionHandler(datasource Datasource) *DefaultTransactionHandler {
 
 	if datasource == nil {
-		slog.Error("starting up - error setting up transactionHandler: datasource is nil")
+		feather_commons_log.Fatal("starting up - error setting up transactionHandler: datasource is nil")
 		return nil
 	}
 
@@ -26,19 +27,19 @@ func (handler *DefaultTransactionHandler) HandleTransaction(ctx context.Context,
 
 	db, err := handler.Datasource.GetDatabase()
 	if err != nil {
-		slog.Error(err.Error())
+		feather_commons_log.Error(err.Error())
 		return err
 	}
 
 	tx, err := db.Begin()
 	if err != nil {
-		slog.Error(err.Error())
+		feather_commons_log.Error(err.Error())
 		return err
 	}
 
 	defer func() {
 		if p := recover(); p != nil {
-			slog.Error(fmt.Sprintf("recovering from panic: %v", p))
+			feather_commons_log.Error(fmt.Sprintf("recovering from panic: %v", p))
 			handleError(tx.Rollback())
 		} else if err != nil {
 			handleError(tx.Rollback())
@@ -56,6 +57,6 @@ func (handler *DefaultTransactionHandler) HandleTransaction(ctx context.Context,
 
 func handleError(err error) {
 	if err != nil {
-		slog.Error(err.Error())
+		feather_commons_log.Error(err.Error())
 	}
 }
