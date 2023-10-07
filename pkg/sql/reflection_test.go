@@ -428,13 +428,13 @@ func Test_retrieveFields(t *testing.T) {
 	reflectedType := reflectedValueOK.Type()
 	idField, _ := reflectedType.FieldByName("Id")
 	nameField, _ := reflectedType.FieldByName("Name")
-	valuesOK := []reflect.StructField{idField, nameField}
+	valuesOK := []*reflect.StructField{&idField, &nameField}
 
 	type modelNoOk struct {
 		id string
 	}
 	reflectedValueNoOk := reflect.ValueOf(modelNoOk{})
-	valuesNoOK := make([]reflect.StructField, 0)
+	valuesNoOK := make([]*reflect.StructField, 0)
 
 	type args struct {
 		reflectedValue reflect.Value
@@ -445,7 +445,7 @@ func Test_retrieveFields(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []reflect.StructField
+		want []*reflect.StructField
 	}{
 		{
 			name: "HappyPath",

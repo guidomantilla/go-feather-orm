@@ -93,9 +93,9 @@ func NoneColumnFilter(_ []string) bool {
 	return false
 }
 
-func RetrieveFields(reflectedValue reflect.Value) []reflect.StructField {
+func RetrieveFields(reflectedValue reflect.Value) []*reflect.StructField {
 
-	fields := make([]reflect.StructField, 0)
+	fields := make([]*reflect.StructField, 0)
 	reflectedType := reflectedValue.Type()
 	numFields := reflectedType.NumField()
 
@@ -105,7 +105,7 @@ func RetrieveFields(reflectedValue reflect.Value) []reflect.StructField {
 			continue
 		}
 
-		fields = append(fields, reflectedField)
+		fields = append(fields, &reflectedField)
 	}
 
 	return fields
