@@ -12,6 +12,8 @@ type DefaultDatasourceContext struct {
 	driverName  feather_sql.DriverName
 	paramHolder feather_sql.ParamHolder
 	url         string
+	server      string
+	service     string
 }
 
 func NewDefaultDatasourceContext(driverName feather_sql.DriverName, paramHolder feather_sql.ParamHolder,
@@ -56,6 +58,8 @@ func NewDefaultDatasourceContext(driverName feather_sql.DriverName, paramHolder 
 		driverName:  driverName,
 		paramHolder: paramHolder,
 		url:         url,
+		server:      server,
+		service:     service,
 	}
 }
 
@@ -69,4 +73,12 @@ func (context *DefaultDatasourceContext) GetParamHolder() feather_sql.ParamHolde
 
 func (context *DefaultDatasourceContext) GetUrl() string {
 	return context.url
+}
+
+func (context *DefaultDatasourceContext) GetServer() string {
+	return context.server
+}
+
+func (context *DefaultDatasourceContext) GetService() string {
+	return context.service
 }

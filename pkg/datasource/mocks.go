@@ -64,6 +64,34 @@ func (mr *MockDatasourceContextMockRecorder) GetParamHolder() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetParamHolder", reflect.TypeOf((*MockDatasourceContext)(nil).GetParamHolder))
 }
 
+// GetServer mocks base method.
+func (m *MockDatasourceContext) GetServer() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetServer")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetServer indicates an expected call of GetServer.
+func (mr *MockDatasourceContextMockRecorder) GetServer() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetServer", reflect.TypeOf((*MockDatasourceContext)(nil).GetServer))
+}
+
+// GetService mocks base method.
+func (m *MockDatasourceContext) GetService() string {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetService")
+	ret0, _ := ret[0].(string)
+	return ret0
+}
+
+// GetService indicates an expected call of GetService.
+func (mr *MockDatasourceContextMockRecorder) GetService() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetService", reflect.TypeOf((*MockDatasourceContext)(nil).GetService))
+}
+
 // GetUrl mocks base method.
 func (m *MockDatasourceContext) GetUrl() string {
 	m.ctrl.T.Helper()

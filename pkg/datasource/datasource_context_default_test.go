@@ -13,6 +13,8 @@ func TestNewDefaultDatasourceContext(t *testing.T) {
 		driverName:  feather_sql.OracleDriverName,
 		paramHolder: feather_sql.NamedParamHolder,
 		url:         "some_usersome_passsome_serversome_service",
+		server:      "some_server",
+		service:     "some_service",
 	}
 	type args struct {
 		driverName  feather_sql.DriverName

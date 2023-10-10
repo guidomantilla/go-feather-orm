@@ -17,6 +17,8 @@ type DatasourceContext interface {
 	GetDriverName() feather_sql.DriverName
 	GetParamHolder() feather_sql.ParamHolder
 	GetUrl() string
+	GetServer() string
+	GetService() string
 }
 
 //
