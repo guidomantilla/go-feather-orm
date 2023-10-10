@@ -45,7 +45,7 @@ func (datasource *DefaultDatasource) GetDatabase() (*sql.DB, error) {
 			feather_commons_log.Error(err.Error())
 			return nil, ErrDBConnectionFailed(err)
 		}
-		feather_commons_log.Info(fmt.Sprintf("connection - connected to %s@%s/%s", datasource.driver, datasource.server, datasource.service))
+		feather_commons_log.Debug(fmt.Sprintf("connection - connected to %s@%s/%s", datasource.driver, datasource.server, datasource.service))
 	}
 
 	if err = datasource.database.Ping(); err != nil {
@@ -53,7 +53,7 @@ func (datasource *DefaultDatasource) GetDatabase() (*sql.DB, error) {
 			feather_commons_log.Error(err.Error())
 			return nil, ErrDBConnectionFailed(err)
 		}
-		feather_commons_log.Info(fmt.Sprintf("connection - reconnected to %s@%s/%s", datasource.driver, datasource.server, datasource.service))
+		feather_commons_log.Debug(fmt.Sprintf("connection - reconnected to %s@%s/%s", datasource.driver, datasource.server, datasource.service))
 	}
 
 	return datasource.database, nil
