@@ -5,13 +5,20 @@ import (
 	"fmt"
 
 	feather_commons_log "github.com/guidomantilla/go-feather-commons/pkg/log"
+
+	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
 type DefaultTransactionHandler struct {
-	Datasource Datasource
+	datasource        Datasource
+	datasourceContext DatasourceContext
 }
 
-func NewTransactionHandler(datasource Datasource) *DefaultTransactionHandler {
+func NewTransactionHandler(datasourceContext DatasourceContext, datasource Datasource) *DefaultTransactionHandler {
+
+	if datasourceContext == nil {
+		feather_commons_log.Fatal("starting up - error setting up transactionHandler: datasourceContext is nil")
+	}
 
 	if datasource == nil {
 		feather_commons_log.Fatal("starting up - error setting up transactionHandler: datasource is nil")
@@ -19,13 +26,14 @@ func NewTransactionHandler(datasource Datasource) *DefaultTransactionHandler {
 	}
 
 	return &DefaultTransactionHandler{
-		Datasource: datasource,
+		datasource:        datasource,
+		datasourceContext: datasourceContext,
 	}
 }
 
 func (handler *DefaultTransactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error {
 
-	db, err := handler.Datasource.GetDatabase()
+	db, err := handler.datasource.GetDatabase()
 	if err != nil {
 		feather_commons_log.Error(err.Error())
 		return err
@@ -48,7 +56,8 @@ func (handler *DefaultTransactionHandler) HandleTransaction(ctx context.Context,
 		}
 	}()
 
-	txCtx := context.WithValue(ctx, TransactionCtxKey{}, tx)
+	driverNameCtx := context.WithValue(ctx, feather_sql.DriverNameCtxKey{}, handler.datasourceContext.GetDriverName())
+	txCtx := context.WithValue(driverNameCtx, TransactionCtxKey{}, tx)
 	err = fn(txCtx, tx)
 	return err
 }

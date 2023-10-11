@@ -2,7 +2,6 @@ package dao
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 
@@ -79,68 +78,27 @@ func NewDefaultCrudDao(datasourceContext feather_sql_datasource.DatasourceContex
 }
 
 func (dao *DefaultCrudDao) Save(ctx context.Context, args ...any) (*int64, error) {
-
-	var err error
-	var serial *int64
-	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if serial, err = WriteContext(ctx, dao.statementCreate, args...); err != nil {
-		return nil, ErrSaveFailed(errors.New(dao.table), err)
-	}
-
-	return serial, nil
+	return MutateOne(ctx, dao.statementCreate, args...)
 }
 
 func (dao *DefaultCrudDao) Update(ctx context.Context, args ...any) error {
-
-	var err error
-	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if _, err = WriteContext(ctx, dao.statementUpdate, args...); err != nil {
-		return ErrUpdateFailed(errors.New(dao.table), err)
-	}
-
-	return nil
+	_, err := MutateOne(ctx, dao.statementUpdate, args...)
+	return err
 }
 
 func (dao *DefaultCrudDao) Delete(ctx context.Context, id any) error {
-
-	var err error
-	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if _, err = WriteContext(ctx, dao.statementDelete, id); err != nil {
-		return ErrDeleteFailed(errors.New(dao.table), err)
-	}
-
-	return nil
+	_, err := MutateOne(ctx, dao.statementDelete, id)
+	return err
 }
 
-func (dao *DefaultCrudDao) FindById(ctx context.Context, id any, args ...any) error {
-
-	var err error
-	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if err = ReadRowContext(ctx, dao.statementFindById, id, args...); err != nil {
-		return ErrFindByIdFailed(errors.New(dao.table), err)
-	}
-
-	return nil
+func (dao *DefaultCrudDao) FindById(ctx context.Context, id any, dest ...any) error {
+	return QueryOne(ctx, dao.statementFindById, id, dest...)
 }
 
-func (dao *DefaultCrudDao) ExistsById(ctx context.Context, id any, args ...any) bool {
-
-	var err error
-	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if err = dao.FindById(ctx, id, args...); err != nil {
-		return false
-	}
-
-	return true
+func (dao *DefaultCrudDao) ExistsById(ctx context.Context, id any, dest ...any) bool {
+	return Exists(ctx, dao.statementFindById, id, dest...)
 }
 
 func (dao *DefaultCrudDao) FindAll(ctx context.Context, fn ReadFunction) error {
-
-	var err error
-	ctx = context.WithValue(ctx, feather_sql.DriverNameContext{}, dao.driverName)
-	if err = ReadContext(ctx, dao.statementFindAll, fn); err != nil {
-		return ErrFindAllFailed(errors.New(dao.table), err)
-	}
-
-	return nil
+	return QueryMany(ctx, dao.statementFindAll, fn)
 }

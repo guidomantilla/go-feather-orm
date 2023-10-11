@@ -8,6 +8,8 @@ import (
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
 	"github.com/golang/mock/gomock"
+
+	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
 func TestDefaultTransactionHandler_HandleTransaction(t *testing.T) {
@@ -16,42 +18,50 @@ func TestDefaultTransactionHandler_HandleTransaction(t *testing.T) {
 	defer ctrl.Finish()
 
 	errGetDatabasePath := func() *DefaultTransactionHandler {
+		datasourceCtx := NewMockDatasourceContext(ctrl)
 		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(nil, errors.New("some_error"))
-		return NewTransactionHandler(datasource)
+		return NewTransactionHandler(datasourceCtx, datasource)
 	}
 
 	errBeginPath := func() *DefaultTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin().WillReturnError(errors.New("some_error"))
+		datasourceCtx := NewMockDatasourceContext(ctrl)
 		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
-		return NewTransactionHandler(datasource)
+		return NewTransactionHandler(datasourceCtx, datasource)
 	}
 
 	errDeferPath := func() *DefaultTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
+		datasourceCtx := NewMockDatasourceContext(ctrl)
+		datasourceCtx.EXPECT().GetDriverName().Return(feather_sql.MysqlDriverName)
 		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
-		return NewTransactionHandler(datasource)
+		return NewTransactionHandler(datasourceCtx, datasource)
 	}
 
 	panicDeferPath := func() *DefaultTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
+		datasourceCtx := NewMockDatasourceContext(ctrl)
+		datasourceCtx.EXPECT().GetDriverName().Return(feather_sql.MysqlDriverName)
 		sqlMock.ExpectRollback()
 		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
-		return NewTransactionHandler(datasource)
+		return NewTransactionHandler(datasourceCtx, datasource)
 	}
 
 	happyPath := func() *DefaultTransactionHandler {
 		db, sqlMock, _ := sqlmock.New()
 		sqlMock.ExpectBegin()
+		datasourceCtx := NewMockDatasourceContext(ctrl)
+		datasourceCtx.EXPECT().GetDriverName().Return(feather_sql.MysqlDriverName)
 		datasource := NewMockDatasource(ctrl)
 		datasource.EXPECT().GetDatabase().Return(db, nil)
-		return NewTransactionHandler(datasource)
+		return NewTransactionHandler(datasourceCtx, datasource)
 	}
 
 	type args struct {

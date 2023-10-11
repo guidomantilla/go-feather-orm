@@ -9,7 +9,7 @@ import (
 
 	feather_commons_log "github.com/guidomantilla/go-feather-commons/pkg/log"
 
-	feather_sql_transaction "github.com/guidomantilla/go-feather-sql/pkg/datasource"
+	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
@@ -26,7 +26,7 @@ func WriteContext(ctx context.Context, sqlStatement string, args ...any) (*int64
 
 	var ok bool
 	var driverName feather_sql.DriverName
-	if driverName, ok = ctx.Value(feather_sql.DriverNameContext{}).(feather_sql.DriverName); !ok {
+	if driverName, ok = ctx.Value(feather_sql.DriverNameCtxKey{}).(feather_sql.DriverName); !ok {
 		return nil, ErrWriteContextFailed(errors.New(sqlStatement), errors.New("driver name not found in context"))
 	}
 
@@ -104,7 +104,7 @@ func Context(ctx context.Context, sqlStatement string, fn Function) error {
 
 	var ok bool
 	var tx *sql.Tx
-	if tx, ok = ctx.Value(feather_sql_transaction.TransactionCtxKey{}).(*sql.Tx); !ok {
+	if tx, ok = ctx.Value(feather_sql_datasource.TransactionCtxKey{}).(*sql.Tx); !ok {
 		return ErrContextFailed(errors.New(sqlStatement), errors.New("transaction not found in context"))
 	}
 
@@ -131,4 +131,42 @@ func CloseResultSet(rows *sql.Rows) {
 	if err := rows.Close(); err != nil {
 		feather_commons_log.Error(ErrorClosingResultSet)
 	}
+}
+
+//
+
+func MutateOne(ctx context.Context, sqlStatement string, args ...any) (*int64, error) {
+
+	var err error
+	var serial *int64
+	if serial, err = WriteContext(ctx, sqlStatement, args...); err != nil {
+		return nil, ErrMutateFailed(errors.New(sqlStatement), err)
+	}
+	return serial, nil
+}
+
+func QueryOne(ctx context.Context, sqlStatement string, id any, dest ...any) error {
+
+	var err error
+	if err = ReadRowContext(ctx, sqlStatement, id, dest...); err != nil {
+		return ErrQueryOneFailed(errors.New(sqlStatement), err)
+	}
+	return nil
+}
+
+func Exists(ctx context.Context, sqlStatement string, id any, dest ...any) bool {
+
+	if err := QueryOne(ctx, sqlStatement, id, dest...); err != nil {
+		return false
+	}
+	return true
+}
+
+func QueryMany(ctx context.Context, sqlStatement string, fn ReadFunction) error {
+
+	var err error
+	if err = ReadContext(ctx, sqlStatement, fn); err != nil {
+		return ErrQueryManyFailed(errors.New(sqlStatement), err)
+	}
+	return nil
 }

@@ -9,7 +9,7 @@ const (
 	PostgresDriverName
 )
 
-type DriverNameContext struct{}
+type DriverNameCtxKey struct{}
 
 type DriverName int
 
