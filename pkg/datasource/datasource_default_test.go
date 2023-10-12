@@ -7,12 +7,13 @@ import (
 	"testing"
 
 	sqlmock "github.com/DATA-DOG/go-sqlmock"
+	"github.com/jmoiron/sqlx"
 
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
 func TestNewDefaultDatasource(t *testing.T) {
-	openFunc := OpenDatasourceFunc(func(driverName, dataSourceUrl string) (*sql.DB, error) {
+	openFunc := OpenDatasourceFunc(func(driverName, dataSourceUrl string) (*sqlx.DB, error) {
 		return nil, nil
 	})
 	datasourceCtx := &DefaultDatasourceContext{
@@ -77,7 +78,7 @@ func TestDefaultDatasource_GetDatabase(t *testing.T) {
 			driver:   datasourceCtx.driverName.String(),
 			url:      datasourceCtx.url,
 			database: nil,
-			openFunc: func(driverName, dataSourceUrl string) (*sql.DB, error) {
+			openFunc: func(driverName, dataSourceUrl string) (*sqlx.DB, error) {
 				return nil, errors.New("some_error")
 			},
 		}
@@ -91,12 +92,13 @@ func TestDefaultDatasource_GetDatabase(t *testing.T) {
 		if db, mock, err = sqlmock.New(sqlmock.MonitorPingsOption(true)); err != nil {
 			t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 		}
+		dbx := sqlx.NewDb(db, "some driver name")
 		mock.ExpectPing().WillReturnError(errors.New("some error"))
 		return &DefaultDatasource{
 			driver:   datasourceCtx.driverName.String(),
 			url:      datasourceCtx.url,
-			database: db,
-			openFunc: func(driverName, dataSourceUrl string) (*sql.DB, error) {
+			database: dbx,
+			openFunc: func(driverName, dataSourceUrl string) (*sqlx.DB, error) {
 				return nil, errors.New("some_error")
 			},
 		}
@@ -108,13 +110,14 @@ func TestDefaultDatasource_GetDatabase(t *testing.T) {
 	if db, mock, err = sqlmock.New(); err != nil {
 		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
 	}
+	dbx := sqlx.NewDb(db, "some driver name")
 	mock.ExpectPing()
 	happyPath := func() *DefaultDatasource {
 		return &DefaultDatasource{
 			driver: datasourceCtx.driverName.String(),
 			url:    datasourceCtx.url,
-			openFunc: func(driverName, dataSourceUrl string) (*sql.DB, error) {
-				return db, nil
+			openFunc: func(driverName, dataSourceUrl string) (*sqlx.DB, error) {
+				return dbx, nil
 			},
 		}
 	}
@@ -122,7 +125,7 @@ func TestDefaultDatasource_GetDatabase(t *testing.T) {
 	tests := []struct {
 		name       string
 		datasource *DefaultDatasource
-		want       *sql.DB
+		want       *sqlx.DB
 		wantErr    bool
 	}{
 		{
@@ -140,7 +143,7 @@ func TestDefaultDatasource_GetDatabase(t *testing.T) {
 		{
 			name:       "HappyPath",
 			datasource: happyPath(),
-			want:       db,
+			want:       dbx,
 			wantErr:    false,
 		},
 	}

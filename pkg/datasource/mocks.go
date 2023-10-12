@@ -6,11 +6,11 @@ package datasource
 
 import (
 	context "context"
-	sql "database/sql"
 	reflect "reflect"
 
 	gomock "github.com/golang/mock/gomock"
-	sql0 "github.com/guidomantilla/go-feather-sql/pkg/sql"
+	sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
+	sqlx "github.com/jmoiron/sqlx"
 )
 
 // MockDatasourceContext is a mock of DatasourceContext interface.
@@ -37,10 +37,10 @@ func (m *MockDatasourceContext) EXPECT() *MockDatasourceContextMockRecorder {
 }
 
 // GetDriverName mocks base method.
-func (m *MockDatasourceContext) GetDriverName() sql0.DriverName {
+func (m *MockDatasourceContext) GetDriverName() sql.DriverName {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDriverName")
-	ret0, _ := ret[0].(sql0.DriverName)
+	ret0, _ := ret[0].(sql.DriverName)
 	return ret0
 }
 
@@ -51,10 +51,10 @@ func (mr *MockDatasourceContextMockRecorder) GetDriverName() *gomock.Call {
 }
 
 // GetParamHolder mocks base method.
-func (m *MockDatasourceContext) GetParamHolder() sql0.ParamHolder {
+func (m *MockDatasourceContext) GetParamHolder() sql.ParamHolder {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetParamHolder")
-	ret0, _ := ret[0].(sql0.ParamHolder)
+	ret0, _ := ret[0].(sql.ParamHolder)
 	return ret0
 }
 
@@ -130,10 +130,10 @@ func (m *MockDatasource) EXPECT() *MockDatasourceMockRecorder {
 }
 
 // GetDatabase mocks base method.
-func (m *MockDatasource) GetDatabase() (*sql.DB, error) {
+func (m *MockDatasource) GetDatabase() (*sqlx.DB, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetDatabase")
-	ret0, _ := ret[0].(*sql.DB)
+	ret0, _ := ret[0].(*sqlx.DB)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

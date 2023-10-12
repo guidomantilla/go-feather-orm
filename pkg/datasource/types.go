@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/jmoiron/sqlx"
+
 	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
@@ -23,10 +25,10 @@ type DatasourceContext interface {
 
 //
 
-type OpenDatasourceFunc func(driverName, datasourceUrl string) (*sql.DB, error)
+type OpenDatasourceFunc func(driverName, datasourceUrl string) (*sqlx.DB, error)
 
 type Datasource interface {
-	GetDatabase() (*sql.DB, error)
+	GetDatabase() (*sqlx.DB, error)
 }
 
 //

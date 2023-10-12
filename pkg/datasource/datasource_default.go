@@ -1,10 +1,10 @@
 package datasource
 
 import (
-	"database/sql"
 	"fmt"
 
 	feather_commons_log "github.com/guidomantilla/go-feather-commons/pkg/log"
+	"github.com/jmoiron/sqlx"
 )
 
 type DefaultDatasource struct {
@@ -12,7 +12,7 @@ type DefaultDatasource struct {
 	url      string
 	server   string
 	service  string
-	database *sql.DB
+	database *sqlx.DB
 	openFunc OpenDatasourceFunc
 }
 
@@ -36,7 +36,7 @@ func NewDefaultDatasource(datasourceContext DatasourceContext, openFunc OpenData
 	}
 }
 
-func (datasource *DefaultDatasource) GetDatabase() (*sql.DB, error) {
+func (datasource *DefaultDatasource) GetDatabase() (*sqlx.DB, error) {
 
 	var err error
 

@@ -97,6 +97,7 @@ func TestReadContext(t *testing.T) {
 	type args struct {
 		ctx          context.Context
 		sqlStatement string
+		key          []any
 		fn           ReadFunction
 	}
 	tests := []struct {
@@ -147,7 +148,7 @@ func TestReadContext(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := ReadContext(tt.args.ctx, tt.args.sqlStatement, tt.args.fn); (err != nil) != tt.wantErr {
+			if err := ReadContext(tt.args.ctx, tt.args.sqlStatement, tt.args.key, tt.args.fn); (err != nil) != tt.wantErr {
 				t.Errorf("ReadContext() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -232,7 +233,7 @@ func TestReadRowContext(t *testing.T) {
 	type args struct {
 		ctx          context.Context
 		sqlStatement string
-		key          any
+		key          []any
 		dest         []any
 	}
 	tests := []struct {
@@ -283,7 +284,7 @@ func TestReadRowContext(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := ReadRowContext(tt.args.ctx, tt.args.sqlStatement, tt.args.key, tt.args.dest...); (err != nil) != tt.wantErr {
+			if err := ReadRowContext(tt.args.ctx, tt.args.sqlStatement, tt.args.key, tt.args.dest); (err != nil) != tt.wantErr {
 				t.Errorf("ReadRowContext() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

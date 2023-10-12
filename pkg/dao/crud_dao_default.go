@@ -92,13 +92,13 @@ func (dao *DefaultCrudDao) Delete(ctx context.Context, id any) error {
 }
 
 func (dao *DefaultCrudDao) FindById(ctx context.Context, id any, dest ...any) error {
-	return QueryOne(ctx, dao.statementFindById, id, dest...)
+	return QueryOne(ctx, dao.statementFindById, []any{id}, []any{dest})
 }
 
 func (dao *DefaultCrudDao) ExistsById(ctx context.Context, id any, dest ...any) bool {
-	return Exists(ctx, dao.statementFindById, id, dest...)
+	return Exists(ctx, dao.statementFindById, []any{id}, []any{dest})
 }
 
 func (dao *DefaultCrudDao) FindAll(ctx context.Context, fn ReadFunction) error {
-	return QueryMany(ctx, dao.statementFindAll, fn)
+	return QueryMany(ctx, dao.statementFindAll, []any{}, fn)
 }

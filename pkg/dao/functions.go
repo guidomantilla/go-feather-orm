@@ -27,7 +27,7 @@ func WriteContext(ctx context.Context, sqlStatement string, args ...any) (*int64
 	var ok bool
 	var driverName feather_sql.DriverName
 	if driverName, ok = ctx.Value(feather_sql.DriverNameCtxKey{}).(feather_sql.DriverName); !ok {
-		return nil, ErrWriteContextFailed(errors.New(sqlStatement), errors.New("driver name not found in context"))
+		return nil, ErrContextFailed(errors.New("driver name not found in context"))
 	}
 
 	var err error
@@ -48,19 +48,19 @@ func WriteContext(ctx context.Context, sqlStatement string, args ...any) (*int64
 		return nil
 	})
 	if err != nil {
-		return nil, ErrWriteContextFailed(errors.New(sqlStatement), err)
+		return nil, err
 	}
 
 	return &serial, nil
 }
 
-func ReadContext(ctx context.Context, sqlStatement string, fn ReadFunction) error {
+func ReadContext(ctx context.Context, sqlStatement string, key []any, fn ReadFunction) error {
 
 	var err error
 	err = Context(ctx, sqlStatement, func(statement *sql.Stmt) error {
 
 		var rows *sql.Rows
-		if rows, err = statement.Query(); err != nil {
+		if rows, err = statement.Query(key...); err != nil {
 			return err
 		}
 		defer CloseResultSet(rows)
@@ -71,18 +71,18 @@ func ReadContext(ctx context.Context, sqlStatement string, fn ReadFunction) erro
 		return nil
 	})
 	if err != nil {
-		return ErrReadContextFailed(errors.New(sqlStatement), err)
+		return err
 	}
 
 	return nil
 }
 
-func ReadRowContext(ctx context.Context, sqlStatement string, key any, dest ...any) error {
+func ReadRowContext(ctx context.Context, sqlStatement string, key []any, dest []any) error {
 
 	var err error
 	err = Context(ctx, sqlStatement, func(statement *sql.Stmt) error {
 
-		row := statement.QueryRow(key)
+		row := statement.QueryRow(key...)
 		if err = row.Scan(dest...); err != nil {
 			if err.Error() == "db_column: no rows in result set" {
 				return fmt.Errorf("row with key %v not found", key)
@@ -92,7 +92,7 @@ func ReadRowContext(ctx context.Context, sqlStatement string, key any, dest ...a
 		return nil
 	})
 	if err != nil {
-		return ErrReadRowContextFailed(errors.New(sqlStatement), err)
+		return err
 	}
 
 	return nil
@@ -136,37 +136,21 @@ func CloseResultSet(rows *sql.Rows) {
 //
 
 func MutateOne(ctx context.Context, sqlStatement string, args ...any) (*int64, error) {
-
-	var err error
-	var serial *int64
-	if serial, err = WriteContext(ctx, sqlStatement, args...); err != nil {
-		return nil, ErrMutateFailed(errors.New(sqlStatement), err)
-	}
-	return serial, nil
+	return WriteContext(ctx, sqlStatement, args...)
 }
 
-func QueryOne(ctx context.Context, sqlStatement string, id any, dest ...any) error {
-
-	var err error
-	if err = ReadRowContext(ctx, sqlStatement, id, dest...); err != nil {
-		return ErrQueryOneFailed(errors.New(sqlStatement), err)
-	}
-	return nil
+func QueryOne(ctx context.Context, sqlStatement string, key []any, dest ...any) error {
+	return ReadRowContext(ctx, sqlStatement, key, dest)
 }
 
-func Exists(ctx context.Context, sqlStatement string, id any, dest ...any) bool {
+func Exists(ctx context.Context, sqlStatement string, key []any, dest ...any) bool {
 
-	if err := QueryOne(ctx, sqlStatement, id, dest...); err != nil {
+	if err := QueryOne(ctx, sqlStatement, key, dest); err != nil {
 		return false
 	}
 	return true
 }
 
-func QueryMany(ctx context.Context, sqlStatement string, fn ReadFunction) error {
-
-	var err error
-	if err = ReadContext(ctx, sqlStatement, fn); err != nil {
-		return ErrQueryManyFailed(errors.New(sqlStatement), err)
-	}
-	return nil
+func QueryMany(ctx context.Context, sqlStatement string, key []any, fn ReadFunction) error {
+	return ReadContext(ctx, sqlStatement, key, fn)
 }
