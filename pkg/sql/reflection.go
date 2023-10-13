@@ -6,9 +6,7 @@ import (
 )
 
 const (
-	TagTableKey       = "db_table"
-	TagViewKey        = "db_view"
-	TagColumnKey      = "db_column"
+	TagColumnKey      = "db"
 	TagPkValue        = "pk"
 	TagUqValue        = "uq"
 	TagGeneratedValue = "generated"

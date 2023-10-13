@@ -12,23 +12,23 @@ func TestRetrieveColumnNames(t *testing.T) {
 		Name string
 	}
 	type modelOK02 struct {
-		Id   string `db_column:"-"`
-		Name string `db_column:"-"`
+		Id   string `db:"-"`
+		Name string `db:"-"`
 	}
 
 	type modelOK03 struct {
-		Id   string `db_column:""`
-		Name string `db_column:""`
+		Id   string `db:""`
+		Name string `db:""`
 	}
 
 	type modelOK04 struct {
-		Id   string `db_column:","`
-		Name string `db_column:","`
+		Id   string `db:","`
+		Name string `db:","`
 	}
 
 	type modelOK05 struct {
-		Id   string `db_column:"id"`
-		Name string `db_column:"name"`
+		Id   string `db:"id"`
+		Name string `db:"name"`
 	}
 
 	type args struct {

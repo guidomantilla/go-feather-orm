@@ -33,18 +33,18 @@ func NewTransactionHandler(datasourceContext DatasourceContext, datasource Datas
 
 func (handler *DefaultTransactionHandler) HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error {
 
-	db, err := handler.datasource.GetDatabase()
+	dbx, err := handler.datasource.GetDatabase()
 	if err != nil {
 		feather_commons_log.Error(err.Error())
 		return err
 	}
+	defer func() {
+		if p := recover(); p != nil {
+			feather_commons_log.Error(fmt.Sprintf("recovering from panic: %v", p))
+		}
+	}()
 
-	tx, err := db.Begin()
-	if err != nil {
-		feather_commons_log.Error(err.Error())
-		return err
-	}
-
+	tx := dbx.MustBegin()
 	defer func() {
 		if p := recover(); p != nil {
 			feather_commons_log.Error(fmt.Sprintf("recovering from panic: %v", p))

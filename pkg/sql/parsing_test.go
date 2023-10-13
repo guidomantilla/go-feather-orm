@@ -33,7 +33,7 @@ func TestParseColumnAsNameValueSequence(t *testing.T) {
 
 	errEvalColumnFuncIsNilPath := func() args {
 		type model struct {
-			Id string `db_column:"id"`
+			Id string `db:"id"`
 		}
 		return args{
 			value: model{},
@@ -43,7 +43,7 @@ func TestParseColumnAsNameValueSequence(t *testing.T) {
 
 	happyPath := func() args {
 		type model struct {
-			Id string `db_column:"id"`
+			Id string `db:"id"`
 		}
 		return args{
 			value:     model{},

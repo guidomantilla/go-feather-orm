@@ -4,13 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
-	"strings"
 
 	feather_commons_log "github.com/guidomantilla/go-feather-commons/pkg/log"
+	"github.com/jmoiron/sqlx"
 
 	feather_sql_datasource "github.com/guidomantilla/go-feather-sql/pkg/datasource"
-	feather_sql "github.com/guidomantilla/go-feather-sql/pkg/sql"
 )
 
 const (
@@ -18,99 +16,33 @@ const (
 	ErrorClosingResultSet = "Error closing the result set"
 )
 
-type Function func(statement *sql.Stmt) error
+type QueryFunction func(statement *sqlx.Stmt) error
 
-type ReadFunction func(rows *sql.Rows) error
-
-func WriteContext(ctx context.Context, sqlStatement string, args ...any) (*int64, error) {
-
-	var ok bool
-	var driverName feather_sql.DriverName
-	if driverName, ok = ctx.Value(feather_sql.DriverNameCtxKey{}).(feather_sql.DriverName); !ok {
-		return nil, ErrContextFailed(errors.New("driver name not found in context"))
-	}
-
-	var err error
-	var serial int64
-	err = Context(ctx, sqlStatement, func(statement *sql.Stmt) error {
-
-		var result sql.Result
-		if result, err = statement.Exec(args...); err != nil {
-			return err
-		}
-
-		if strings.Index(strings.ToLower(sqlStatement), "insert") == 0 && driverName != feather_sql.OracleDriverName {
-			if serial, err = result.LastInsertId(); err != nil {
-				return err
-			}
-		}
-
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	return &serial, nil
-}
-
-func ReadContext(ctx context.Context, sqlStatement string, key []any, fn ReadFunction) error {
-
-	var err error
-	err = Context(ctx, sqlStatement, func(statement *sql.Stmt) error {
-
-		var rows *sql.Rows
-		if rows, err = statement.Query(key...); err != nil {
-			return err
-		}
-		defer CloseResultSet(rows)
-
-		if err = fn(rows); err != nil {
-			return err
-		}
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func ReadRowContext(ctx context.Context, sqlStatement string, key []any, dest []any) error {
-
-	var err error
-	err = Context(ctx, sqlStatement, func(statement *sql.Stmt) error {
-
-		row := statement.QueryRow(key...)
-		if err = row.Scan(dest...); err != nil {
-			if err.Error() == "db_column: no rows in result set" {
-				return fmt.Errorf("row with key %v not found", key)
-			}
-			return err
-		}
-		return nil
-	})
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
+type MutateFunction func(result sql.Result) error
 
 //
 
-func Context(ctx context.Context, sqlStatement string, fn Function) error {
+func CloseStatement(statement *sqlx.Stmt) {
+	if err := statement.Close(); err != nil {
+		feather_commons_log.Error(ErrorClosingStatement)
+	}
+}
 
-	var ok bool
-	var tx *sql.Tx
-	if tx, ok = ctx.Value(feather_sql_datasource.TransactionCtxKey{}).(*sql.Tx); !ok {
+func CloseResultSet(rows *sqlx.Rows) {
+	if err := rows.Close(); err != nil {
+		feather_commons_log.Error(ErrorClosingResultSet)
+	}
+}
+
+func QueryContext(ctx context.Context, sqlStatement string, fn QueryFunction) error {
+
+	tx, ok := ctx.Value(feather_sql_datasource.TransactionCtxKey{}).(*sqlx.Tx)
+	if !ok {
 		return ErrContextFailed(errors.New(sqlStatement), errors.New("transaction not found in context"))
 	}
 
-	var err error
-	var statement *sql.Stmt
-	if statement, err = tx.Prepare(sqlStatement); err != nil {
+	statement, err := tx.Preparex(sqlStatement)
+	if err != nil {
 		return ErrContextFailed(errors.New(sqlStatement), err)
 	}
 	defer CloseStatement(statement)
@@ -121,36 +53,52 @@ func Context(ctx context.Context, sqlStatement string, fn Function) error {
 	return nil
 }
 
-func CloseStatement(statement *sql.Stmt) {
-	if err := statement.Close(); err != nil {
-		feather_commons_log.Error(ErrorClosingStatement)
+func MutateContext(ctx context.Context, sqlStatement string, target any, fn MutateFunction) error {
+
+	tx, ok := ctx.Value(feather_sql_datasource.TransactionCtxKey{}).(*sqlx.Tx)
+	if !ok {
+		return ErrContextFailed(errors.New(sqlStatement), errors.New("transaction not found in context"))
 	}
-}
 
-func CloseResultSet(rows *sql.Rows) {
-	if err := rows.Close(); err != nil {
-		feather_commons_log.Error(ErrorClosingResultSet)
+	result, err := tx.NamedExecContext(ctx, sqlStatement, target)
+	if err != nil {
+		return ErrContextFailed(errors.New(sqlStatement), err)
 	}
+
+	if err = fn(result); err != nil {
+		return ErrContextFailed(errors.New(sqlStatement), err)
+	}
+	return nil
 }
 
-//
-
-func MutateOne(ctx context.Context, sqlStatement string, args ...any) (*int64, error) {
-	return WriteContext(ctx, sqlStatement, args...)
+func MutateOne(ctx context.Context, sqlStatement string, target any) error {
+	return MutateContext(ctx, sqlStatement, target, func(result sql.Result) error {
+		count, err := result.RowsAffected()
+		if err != nil {
+			return err
+		}
+		if count > int64(1) {
+			return errors.New("more than one affected")
+		}
+		return nil
+	})
 }
 
-func QueryOne(ctx context.Context, sqlStatement string, key []any, dest ...any) error {
-	return ReadRowContext(ctx, sqlStatement, key, dest)
+func QueryOne(ctx context.Context, sqlStatement string, dest any, args ...any) error {
+	return QueryContext(ctx, sqlStatement, func(statement *sqlx.Stmt) error {
+		return statement.GetContext(ctx, dest, args...)
+	})
 }
 
-func Exists(ctx context.Context, sqlStatement string, key []any, dest ...any) bool {
+func QueryMany(ctx context.Context, sqlStatement string, dest any, args ...any) error {
+	return QueryContext(ctx, sqlStatement, func(statement *sqlx.Stmt) error {
+		return statement.SelectContext(ctx, dest, args...)
+	})
+}
 
-	if err := QueryOne(ctx, sqlStatement, key, dest); err != nil {
+func Exists(ctx context.Context, sqlStatement string, dest any, args ...any) bool {
+	if err := QueryOne(ctx, sqlStatement, dest, args); err != nil {
 		return false
 	}
 	return true
-}
-
-func QueryMany(ctx context.Context, sqlStatement string, key []any, fn ReadFunction) error {
-	return ReadContext(ctx, sqlStatement, key, fn)
 }

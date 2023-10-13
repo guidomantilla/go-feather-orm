@@ -2,7 +2,6 @@ package datasource
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/jmoiron/sqlx"
 
@@ -35,7 +34,7 @@ type Datasource interface {
 
 type TransactionCtxKey struct{}
 
-type TransactionHandlerFunction func(ctx context.Context, tx *sql.Tx) error
+type TransactionHandlerFunction func(ctx context.Context, tx *sqlx.Tx) error
 
 type TransactionHandler interface {
 	HandleTransaction(ctx context.Context, fn TransactionHandlerFunction) error

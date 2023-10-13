@@ -1,0 +1,27 @@
+driverName := datasourceContext.GetDriverName()
+	paramHolder := datasourceContext.GetParamHolder()
+
+	statementCreate, err := feather_sql.CreateInsertSQL(table, model, driverName, paramHolder)
+	if err != nil {
+		feather_commons_log.Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
+	}
+
+	statementUpdate, err := feather_sql.CreateUpdateSQL(table, model, driverName, paramHolder, feather_sql.PkColumnFilter)
+	if err != nil {
+		feather_commons_log.Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
+	}
+
+	statementDelete, err := feather_sql.CreateDeleteSQL(table, model, driverName, paramHolder, feather_sql.PkColumnFilter)
+	if err != nil {
+		feather_commons_log.Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
+	}
+
+	statementFindById, err := feather_sql.CreateSelectSQL(table, model, driverName, paramHolder, feather_sql.PkColumnFilter)
+	if err != nil {
+		feather_commons_log.Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
+	}
+
+	statementFindAll, err := feather_sql.CreateSelectSQL(table, model, driverName, paramHolder, nil)
+	if err != nil {
+		feather_commons_log.Fatal(fmt.Sprintf("starting up - error setting up %s dao: %s", table, err.Error()))
+	}
