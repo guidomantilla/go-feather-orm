@@ -63,9 +63,9 @@ func EvalValueOnlyNumbered(_ string, cont int, separator string) string {
 // Questioned
 
 func EvalNameValueQuestioned(name string, _ int, separator string) string {
-	return name + " = :?" + separator
+	return name + " = ?" + separator
 }
 
 func EvalValueOnlyQuestioned(_ string, _ int, separator string) string {
-	return ":?" + separator
+	return "?" + separator
 }

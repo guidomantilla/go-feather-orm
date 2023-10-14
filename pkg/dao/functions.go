@@ -16,13 +16,13 @@ const (
 	ErrorClosingResultSet = "Error closing the result set"
 )
 
-type QueryFunction func(statement *sqlx.Stmt) error
+type QueryFunction func(statement *sqlx.NamedStmt) error
 
 type MutateFunction func(result sql.Result) error
 
 //
 
-func CloseStatement(statement *sqlx.Stmt) {
+func CloseStatement(statement *sqlx.NamedStmt) {
 	if err := statement.Close(); err != nil {
 		feather_commons_log.Error(ErrorClosingStatement)
 	}
@@ -41,7 +41,7 @@ func QueryContext(ctx context.Context, sqlStatement string, fn QueryFunction) er
 		return ErrContextFailed(errors.New(sqlStatement), errors.New("transaction not found in context"))
 	}
 
-	statement, err := tx.Preparex(sqlStatement)
+	statement, err := tx.PrepareNamed(sqlStatement)
 	if err != nil {
 		return ErrContextFailed(errors.New(sqlStatement), err)
 	}
@@ -71,7 +71,7 @@ func MutateContext(ctx context.Context, sqlStatement string, target any, fn Muta
 	return nil
 }
 
-func MutateOne(ctx context.Context, sqlStatement string, target any) error {
+func MutateOne[T any](ctx context.Context, sqlStatement string, target *T) error {
 	return MutateContext(ctx, sqlStatement, target, func(result sql.Result) error {
 		count, err := result.RowsAffected()
 		if err != nil {
@@ -84,20 +84,28 @@ func MutateOne(ctx context.Context, sqlStatement string, target any) error {
 	})
 }
 
-func QueryOne(ctx context.Context, sqlStatement string, dest any, args ...any) error {
-	return QueryContext(ctx, sqlStatement, func(statement *sqlx.Stmt) error {
-		return statement.GetContext(ctx, dest, args...)
+func QueryOne[T any](ctx context.Context, sqlStatement string, target *T) error {
+	return QueryContext(ctx, sqlStatement, func(statement *sqlx.NamedStmt) error {
+		return statement.GetContext(ctx, target, target)
 	})
 }
 
-func QueryMany(ctx context.Context, sqlStatement string, dest any, args ...any) error {
-	return QueryContext(ctx, sqlStatement, func(statement *sqlx.Stmt) error {
-		return statement.SelectContext(ctx, dest, args...)
+func QueryMany[T any](ctx context.Context, sqlStatement string, args *T) ([]T, error) {
+
+	var dest []T
+	err := QueryContext(ctx, sqlStatement, func(statement *sqlx.NamedStmt) error {
+		return statement.SelectContext(ctx, &dest, args)
 	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return dest, nil
 }
 
-func Exists(ctx context.Context, sqlStatement string, dest any, args ...any) bool {
-	if err := QueryOne(ctx, sqlStatement, dest, args); err != nil {
+func Exists[T any](ctx context.Context, sqlStatement string, target *T) bool {
+	if err := QueryOne[T](ctx, sqlStatement, target); err != nil {
 		return false
 	}
 	return true

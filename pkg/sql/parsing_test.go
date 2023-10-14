@@ -277,7 +277,7 @@ func TestEvalNameValueQuestioned(t *testing.T) {
 				in1:       0,
 				separator: "separator",
 			},
-			want: "name = :?separator",
+			want: "name = ?separator",
 		},
 	}
 	for _, tt := range tests {
@@ -307,7 +307,7 @@ func TestEvalValueOnlyQuestioned(t *testing.T) {
 				in1:       0,
 				separator: "separator",
 			},
-			want: ":?separator",
+			want: "?separator",
 		},
 	}
 	for _, tt := range tests {

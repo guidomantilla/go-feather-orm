@@ -38,13 +38,13 @@ func (handler *DefaultTransactionHandler) HandleTransaction(ctx context.Context,
 		feather_commons_log.Error(err.Error())
 		return err
 	}
-	defer func() {
-		if p := recover(); p != nil {
-			feather_commons_log.Error(fmt.Sprintf("recovering from panic: %v", p))
-		}
-	}()
 
-	tx := dbx.MustBegin()
+	tx, err := dbx.Beginx()
+	if err != nil {
+		feather_commons_log.Error(err.Error())
+		return err
+	}
+
 	defer func() {
 		if p := recover(); p != nil {
 			feather_commons_log.Error(fmt.Sprintf("recovering from panic: %v", p))
