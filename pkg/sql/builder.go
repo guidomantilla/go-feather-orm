@@ -60,6 +60,10 @@ func CreateInsertSQL(table string, value any, driverName DriverName, paramHolder
 	return "INSERT INTO " + table + " " + nameSequence + " VALUES " + valueSequence + returning, nil
 }
 
+func CreateUpsertSQL(table string, value any, driverName DriverName, paramHolder ParamHolder) (string, error) {
+	return "TO IMPLEMENT", nil
+}
+
 func CreateUpdateSQL(table string, value any, _ DriverName, paramHolder ParamHolder, fn01 ColumnFilterFunc) (string, error) {
 
 	separator := ", "

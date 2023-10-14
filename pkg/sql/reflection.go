@@ -47,6 +47,8 @@ func RetrieveColumnNames(value any, columnFilterFunc ColumnFilterFunc) ([]string
 	return columnNames, nil
 }
 
+//
+
 type ColumnFilterFunc func(values []string) bool
 
 func KeyColumnFilter(values []string) bool {
@@ -90,6 +92,8 @@ func ColumnFilter(values []string) bool {
 func NoneColumnFilter(_ []string) bool {
 	return false
 }
+
+//
 
 func RetrieveFields(reflectedValue reflect.Value) []*reflect.StructField {
 

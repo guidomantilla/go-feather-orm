@@ -53,7 +53,7 @@ func QueryContext(ctx context.Context, sqlStatement string, fn QueryFunction) er
 	return nil
 }
 
-func MutateContext(ctx context.Context, sqlStatement string, target any, fn MutateFunction) error {
+func MutateContext[T any](ctx context.Context, sqlStatement string, target *T, fn MutateFunction) error {
 
 	tx, ok := ctx.Value(feather_sql_datasource.TransactionCtxKey{}).(*sqlx.Tx)
 	if !ok {
@@ -71,8 +71,14 @@ func MutateContext(ctx context.Context, sqlStatement string, target any, fn Muta
 	return nil
 }
 
-func MutateOne[T any](ctx context.Context, sqlStatement string, target *T) error {
-	return MutateContext(ctx, sqlStatement, target, func(result sql.Result) error {
+//
+
+type Entity interface {
+	any
+}
+
+func MutateOne[T Entity](ctx context.Context, sqlStatement string, target *T) error {
+	return MutateContext[T](ctx, sqlStatement, target, func(result sql.Result) error {
 		count, err := result.RowsAffected()
 		if err != nil {
 			return err
@@ -84,13 +90,13 @@ func MutateOne[T any](ctx context.Context, sqlStatement string, target *T) error
 	})
 }
 
-func QueryOne[T any](ctx context.Context, sqlStatement string, target *T) error {
+func QueryOne[T Entity](ctx context.Context, sqlStatement string, target *T) error {
 	return QueryContext(ctx, sqlStatement, func(statement *sqlx.NamedStmt) error {
 		return statement.GetContext(ctx, target, target)
 	})
 }
 
-func QueryMany[T any](ctx context.Context, sqlStatement string, args *T) ([]T, error) {
+func QueryMany[T Entity](ctx context.Context, sqlStatement string, args *T) ([]T, error) {
 
 	var dest []T
 	err := QueryContext(ctx, sqlStatement, func(statement *sqlx.NamedStmt) error {
@@ -104,7 +110,7 @@ func QueryMany[T any](ctx context.Context, sqlStatement string, args *T) ([]T, e
 	return dest, nil
 }
 
-func Exists[T any](ctx context.Context, sqlStatement string, target *T) bool {
+func Exists[T Entity](ctx context.Context, sqlStatement string, target *T) bool {
 	if err := QueryOne[T](ctx, sqlStatement, target); err != nil {
 		return false
 	}
