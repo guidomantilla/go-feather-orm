@@ -1,7 +1,5 @@
 package sql
 
-type CreateStatementSQLFunc func(table string, value any, driverName DriverName, paramHolder ParamHolder, fn ColumnFilterFunc) string
-
 func CreateSelectSQL(table string, value any, _ DriverName, paramHolder ParamHolder, fn01 ColumnFilterFunc) string {
 
 	empty := ""
@@ -26,7 +24,7 @@ func CreateSelectSQL(table string, value any, _ DriverName, paramHolder ParamHol
 	return "SELECT " + sequence + " FROM " + table + " WHERE " + whereSequence
 }
 
-func CreateInsertSQL(table string, value any, driverName DriverName, paramHolder ParamHolder, _ ColumnFilterFunc) string {
+func CreateInsertSQL(table string, value any, driverName DriverName, paramHolder ParamHolder) string {
 
 	initChar := "("
 	endChar := ")"
@@ -62,7 +60,7 @@ func CreateInsertSQL(table string, value any, driverName DriverName, paramHolder
 	return "INSERT INTO " + table + " " + nameSequence + " VALUES " + valueSequence + returning
 }
 
-func CreateUpsertSQL(table string, value any, driverName DriverName, paramHolder ParamHolder, _ ColumnFilterFunc) string {
+func CreateUpsertSQL(table string, value any, driverName DriverName, paramHolder ParamHolder) string {
 	return "TO IMPLEMENT"
 }
 

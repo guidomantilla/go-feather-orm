@@ -77,6 +77,14 @@ type Entity interface {
 	any
 }
 
+type MutateOneFn[T Entity] func(ctx context.Context, target *T) error
+
+type QueryOneFn[T Entity] func(ctx context.Context, target *T) error
+
+type QueryManyFn[T Entity] func(ctx context.Context, target *T) ([]T, error)
+
+type ExistsFn[T Entity] func(ctx context.Context, target *T) bool
+
 func MutateOne[T Entity](ctx context.Context, sqlStatement string, target *T) error {
 	return MutateContext[T](ctx, sqlStatement, target, func(result sql.Result) error {
 		count, err := result.RowsAffected()
