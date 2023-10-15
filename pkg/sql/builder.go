@@ -86,7 +86,7 @@ func CreateUpdateSQL(table string, value any, _ DriverName, paramHolder ParamHol
 
 func CreateDeleteSQL(table string, value any, _ DriverName, paramHolder ParamHolder, fn01 ColumnFilterFunc) string {
 
-	separator := ", "
+	separator := " AND "
 	empty := ""
 
 	var err error
