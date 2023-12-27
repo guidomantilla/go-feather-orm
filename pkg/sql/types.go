@@ -1,6 +1,8 @@
 package sql
 
-import "strings"
+import (
+	"strings"
+)
 
 const (
 	UndefinedDriverName DriverName = iota

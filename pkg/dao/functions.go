@@ -99,16 +99,22 @@ func MutateOne[T Entity](ctx context.Context, sqlStatement string, target *T) er
 	return nil
 }
 
-func QueryOne[T Entity](ctx context.Context, sqlStatement string, target *T) error {
-	return QueryContext(ctx, sqlStatement, func(statement *sqlx.NamedStmt) error {
-		return statement.GetContext(ctx, target, target)
+func QueryOne[T Entity](ctx context.Context, sqlStatement string, criteria *T) (*T, error) {
+	var dest *T
+	err := QueryContext(ctx, sqlStatement, func(statement *sqlx.NamedStmt) error {
+		return statement.GetContext(ctx, dest, criteria)
 	})
+
+	if err != nil {
+		return nil, err
+	}
+	return dest, nil
 }
 
-func QueryMany[T Entity](ctx context.Context, sqlStatement string, args *T) ([]T, error) {
+func QueryMany[T Entity](ctx context.Context, sqlStatement string, criteria *T) ([]T, error) {
 	var dest []T
 	err := QueryContext(ctx, sqlStatement, func(statement *sqlx.NamedStmt) error {
-		return statement.SelectContext(ctx, &dest, args)
+		return statement.SelectContext(ctx, &dest, criteria)
 	})
 	if err != nil {
 		return nil, err
@@ -116,8 +122,8 @@ func QueryMany[T Entity](ctx context.Context, sqlStatement string, args *T) ([]T
 	return dest, nil
 }
 
-func Exists[T Entity](ctx context.Context, sqlStatement string, target *T) bool {
-	if err := QueryOne[T](ctx, sqlStatement, target); err != nil {
+func Exists[T Entity](ctx context.Context, sqlStatement string, criteria *T) bool {
+	if _, err := QueryOne[T](ctx, sqlStatement, criteria); err != nil {
 		return false
 	}
 	return true
